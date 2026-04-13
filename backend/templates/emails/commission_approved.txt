@@ -1,0 +1,11 @@
+Commission Approved
+
+Dear {{ agent_name }},
+
+Great news! The commission for your referral of {{ student_name }} has been approved.
+
+Commission Amount: ₹{{ commission_amount }}
+
+This amount has been added to your 'Ready to Pay' balance.
+
+University Admissions Office

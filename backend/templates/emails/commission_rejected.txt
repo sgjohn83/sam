@@ -1,0 +1,12 @@
+Commission Update
+
+Dear {{ agent_name }},
+
+The commission record for student {{ student_name }} was not approved.
+
+Reason:
+{{ reason }}
+
+If you have questions, please contact agents@college.edu.
+
+University Admissions Office

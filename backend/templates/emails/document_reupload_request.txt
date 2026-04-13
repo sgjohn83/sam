@@ -1,0 +1,33 @@
+Document Re-upload Required
+============================
+
+Dear {{ student_name }},
+
+We have reviewed your application ({{ application_number }}) and need you to re-upload one of your documents.
+
+Document: {{ document_type_label }}
+Issue: {{ rejection_category_label }}
+
+Reason for re-upload request:
+{{ rejection_reason }}
+
+Please upload a new, clear copy of the document by clicking the link below:
+
+{{ reupload_link }}
+
+Please ensure the new document is:
+- Clear and readable
+- Complete (all corners visible)
+- Not expired
+- Matches the correct document type
+
+If you have any questions or need assistance, please contact our support team at {{ support_email }}.
+
+Thank you for your cooperation.
+
+Best regards,
+Admissions Team
+
+---
+This is an automated message. Please do not reply directly to this email.
+For support, contact: {{ support_email }}

@@ -1,0 +1,52 @@
+from django.urls import path
+
+from .views import (
+    StudentApplicationBranchPreferencesView,
+    StudentApplicationDetailView,
+    StudentApplicationPaymentProofUploadView,
+    StudentApplicationStatusView,
+    StudentApplicationSubmitView,
+    ApplicationLockView,
+    ApplicationUnlockView,
+    OfficerApplicationListView,
+    OfficerApplicationDetailView,
+    OfficerDashboardStatsView,
+    WalkinRegisterView,
+    WalkinDocumentScanView,
+    WalkinDocumentOCRStatusView,
+    WalkinInlineVerifyView,
+    WalkinAllocateAndNotifyView,
+    SendFeeInstructionsView,
+    ResendFeeInstructionsView,
+    ConfirmPaymentView,
+    CalculateFeeView,
+)
+
+urlpatterns = [
+    path("", StudentApplicationDetailView.as_view(), name="student-application-detail"),
+    path(
+        "branch-preferences/",
+        StudentApplicationBranchPreferencesView.as_view(),
+        name="student-application-branch-preferences",
+    ),
+    path("submit/", StudentApplicationSubmitView.as_view(), name="student-application-submit"),
+    path("status/", StudentApplicationStatusView.as_view(), name="student-application-status"),
+    path(
+        "payment-proof/",
+        StudentApplicationPaymentProofUploadView.as_view(),
+        name="student-application-payment-proof",
+    ),
+    path("<uuid:pk>/lock/", ApplicationLockView.as_view(), name="application-lock"),
+    path("<uuid:pk>/unlock/", ApplicationUnlockView.as_view(), name="application-unlock"),
+    path("officer/list/", OfficerApplicationListView.as_view(), name="officer-application-list"),
+    path("officer/<uuid:pk>/", OfficerApplicationDetailView.as_view(), name="officer-application-detail"),
+    path("officer/<uuid:pk>/send-fee-instructions/", SendFeeInstructionsView.as_view(), name="send-fee-instructions"),
+    path("officer/<uuid:pk>/resend-fee-instructions/", ResendFeeInstructionsView.as_view(), name="resend-fee-instructions"),
+    path("officer/<uuid:pk>/confirm-payment/", ConfirmPaymentView.as_view(), name="confirm-payment"),
+    path("officer/applications/<uuid:pk>/calculate-fee/", CalculateFeeView.as_view(), name="calculate-fee"),
+    path("walkin/register/", WalkinRegisterView.as_view(), name="walkin-register"),
+    path("walkin/<uuid:application_id>/documents/scan/", WalkinDocumentScanView.as_view(), name="walkin-document-scan"),
+    path("walkin/<uuid:application_id>/documents/<uuid:document_id>/ocr-status/", WalkinDocumentOCRStatusView.as_view(), name="walkin-ocr-status"),
+    path("walkin/<uuid:application_id>/verify/", WalkinInlineVerifyView.as_view(), name="walkin-verify"),
+    path("walkin/<uuid:application_id>/allocate-and-notify/", WalkinAllocateAndNotifyView.as_view(), name="walkin-allocate-notify"),
+]

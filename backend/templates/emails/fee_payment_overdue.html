@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Payment Overdue</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+        .student-info { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .student-info h3 { margin-top: 0; color: #1e3a5f; }
+        .fee-summary { background: white; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .fee-summary h4 { margin-top: 0; color: #1e3a5f; }
+        .fee-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .fee-item:last-child { border-bottom: none; }
+        .fee-label { color: #666; }
+        .fee-value { font-weight: bold; color: #1e3a5f; }
+        .net-payable { font-size: 1.2em; color: #dc2626; font-weight: bold; }
+        .payment-ref { background: #fef3c7; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; }
+        .payment-ref .ref-code { font-size: 1.5em; font-weight: bold; color: #92400e; font-family: monospace; }
+        .deadline { background: #fee2e2; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; }
+        .deadline .date { font-size: 1.3em; font-weight: bold; color: #dc2626; }
+        .deadline .days-overdue { font-size: 1.1em; color: #dc2626; font-weight: bold; }
+        .urgent { background: #fef2f2; border-left: 4px solid #dc2626; padding: 15px; margin: 20px 0; }
+        .warning { background: #fef3c7; border-left: 4px solid #d97706; padding: 15px; margin: 20px 0; }
+        .footer { background: #1e3a5f; color: white; padding: 15px; text-align: center; border-radius: 0 0 8px 8px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Fee Payment Overdue</h1>
+        <p>Application No: {{ application_number }}</p>
+    </div>
+    
+    <div class="content">
+        <div class="student-info">
+            <h3>Dear {{ student_name }},</h3>
+            <p><strong>URGENT:</strong> Your fee payment for admission to <strong>{{ branch_name }}</strong> is now overdue.</p>
+        </div>
+        
+        <div class="fee-summary">
+            <h4>Fee Summary</h4>
+            <div class="fee-item">
+                <span class="fee-label">Net Payable Amount:</span>
+                <span class="fee-value">₹{{ net_payable|floatformat:2 }}</span>
+            </div>
+            <div class="fee-item">
+                <span class="fee-label">Payment Reference:</span>
+                <span class="fee-value">{{ payment_reference }}</span>
+            </div>
+        </div>
+        
+        <div class="payment-ref">
+            <p>Your Payment Reference ID</p>
+            <div class="ref-code">{{ payment_reference }}</div>
+        </div>
+        
+        <div class="deadline">
+            <p>Payment Deadline Was</p>
+            <div class="date">{{ fee_deadline }}</div>
+            <p class="days-overdue">{{ days_overdue }} days overdue</p>
+            <p><strong>Your seat allocation is at risk of cancellation.</strong></p>
+        </div>
+        
+        <div class="urgent">
+            <p><strong>IMMEDIATE ACTION REQUIRED:</strong> Your provisional seat allocation will be cancelled if payment is not received within 48 hours.</p>
+        </div>
+        
+        <div class="warning">
+            <p><strong>To avoid cancellation:</strong></p>
+            <ol>
+                <li>Make the payment immediately using the bank details provided in the original fee instructions</li>
+                <li>Email the payment receipt to admissions@college.edu</li>
+                <li>Include your Payment Reference ID in the email subject</li>
+            </ol>
+        </div>
+        
+        <p>If you have already made the payment, please email your receipt immediately to secure your admission.</p>
+        
+        <p>For any payment-related queries, please contact the admissions office urgently.</p>
+    </div>
+    
+    <div class="footer">
+        <p>{{ contact_info }}</p>
+        <p>This is an automated urgent notification. Please do not reply to this email.</p>
+    </div>
+</body>
+</html>

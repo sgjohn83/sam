@@ -1,0 +1,37 @@
+.confidence-dots-container {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.conf-dot-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+}
+
+.conf-dot-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+  user-select: none;
+}
+
+.conf-dot-icon.high { color: #10b981; }      /* Green */
+.conf-dot-icon.medium { color: #f59e0b; }    /* Yellow */
+.conf-dot-icon.low { color: #ef4444; }       /* Red */
+.conf-dot-icon.none { color: #e2e8f0; }      /* Gray */
+
+.conf-dot-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.conf-dot-item:hover .conf-dot-label {
+  color: #475569;
+}

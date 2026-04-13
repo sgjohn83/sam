@@ -1,0 +1,16 @@
+Dear {{ student_name }},
+
+{{ agent_name }} has registered you for college admission at University.
+
+To continue your application, please verify your email and set your password by visiting:
+{{ otp_verify_link|default:'https://college.edu/verify' }}?email={{ email }}
+
+Alternatively, download our mobile app:
+iOS: https://college.edu/ios
+Android: https://college.edu/android
+
+For any assistance, contact us at {{ support_email }}.
+
+Best regards,
+University Admissions Office
+({{ agent_name }}'s Registered Agent)

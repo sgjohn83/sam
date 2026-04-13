@@ -1,0 +1,17 @@
+Dear {{ student_name }},
+
+Your application {{ application_number }} has been verified and a seat has been allocated.
+
+ALLOCATION DETAILS
+- Branch: {{ branch_name }} ({{ branch_code }})
+- Quota: {{ quota }}
+- Base Fee: ₹{{ fee_amount }}
+{% if fee_concession and fee_concession != "0" %}- Concession: -₹{{ fee_concession }}
+{% endif %}- Amount Due: ₹{{ fee_final }}
+
+PAYMENT DEADLINE: {{ deadline }}
+
+Open the app to complete your payment: {{ payment_link }}
+
+If you miss the deadline, your seat will be revoked and offered to the next eligible candidate.
+Contact {{ support_email }} for queries or extension requests.

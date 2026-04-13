@@ -1,0 +1,31 @@
+Admission Confirmed
+===================
+
+Dear {{ student_name }},
+
+Congratulations! Your admission has been confirmed for the {{ academic_year }} academic session.
+
+ADMISSION DETAILS
+-----------------
+Application Number: {{ application_number }}
+Branch: {{ branch_name }} ({{ branch_code }})
+Quota: {{ quota }}
+Fee Paid: ₹{{ fee_paid_amount }}
+Admission Date: {{ admitted_date }}
+
+NEXT STEPS
+----------
+1. Orientation Program: {{ orientation_date }} at {{ orientation_venue }}
+2. Reporting Date: {{ reporting_date }}
+3. Documents to carry: Original certificates of all uploaded documents
+4. ID Card: Will be issued on the reporting date — bring a passport-size photo
+
+IMPORTANT NOTES
+---------------
+1. Keep this email for future reference.
+2. Bring all original documents for verification on the reporting date.
+3. For any queries, contact the admissions office at {{ support_email }}.
+
+View your admission details in the app: {{ dashboard_link }}
+
+Congratulations once again on your admission!

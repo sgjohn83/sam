@@ -1,0 +1,155 @@
+.progress-summary {
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.progress-header {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.progress-header h3 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.document-list {
+  padding: 0.5rem;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+
+.document-item:hover {
+  background: #f8fafc;
+}
+
+.document-item.verified {
+  background: #f0fdf4;
+}
+
+.document-item.rejected {
+  background: #fef2f2;
+}
+
+.document-item.in_progress,
+.document-item.ready {
+  background: #fffbeb;
+}
+
+.status-icon {
+  flex-shrink: 0;
+}
+
+.status-icon.verified {
+  color: #10b981;
+}
+
+.status-icon.rejected {
+  color: #ef4444;
+}
+
+.status-icon.in-progress {
+  color: #f59e0b;
+}
+
+.status-icon.ready {
+  color: #10b981;
+}
+
+.status-icon.not-started {
+  color: #94a3b8;
+}
+
+.document-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.document-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.document-status {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.document-item.verified .document-status {
+  color: #065f46;
+}
+
+.document-item.rejected .document-status {
+  color: #991b1b;
+}
+
+.document-item.in_progress .document-status,
+.document-item.ready .document-status {
+  color: #92400e;
+}
+
+.progress-footer {
+  padding: 1rem;
+  border-top: 1px solid #f1f5f9;
+  background: #fafafa;
+}
+
+.verified-count {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.lock-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lock-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.lock-btn:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.lock-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-align: center;
+  font-style: italic;
+}

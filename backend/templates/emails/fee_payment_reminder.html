@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fee Payment Reminder</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; }
+    .header { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 32px; text-align: center; }
+    .header h1 { color: #fff; font-size: 22px; margin: 0; }
+    .header p { color: rgba(255,255,255,0.85); font-size: 14px; margin: 8px 0 0; }
+    .body { padding: 32px; }
+    .greeting { font-size: 16px; color: #111827; margin-bottom: 16px; }
+    .fee-card { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 24px; margin: 24px 0; }
+    .fee-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #fef3c7; }
+    .fee-row:last-child { border-bottom: none; }
+    .fee-label { color: #6b7280; font-size: 14px; }
+    .fee-value { color: #111827; font-size: 14px; font-weight: 600; }
+    .fee-total { font-size: 18px; color: #d97706; }
+    .deadline-banner { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; text-align: center; margin: 24px 0; }
+    .deadline-banner strong { color: #92400e; font-size: 16px; }
+    .urgency-banner { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+    .urgency-banner strong { color: #92400e; }
+    .cta { display: block; background: #f59e0b; color: #fff; text-decoration: none; text-align: center; padding: 14px 24px; border-radius: 8px; font-weight: 600;
+font-size: 16px; margin: 24px 0; }
+    .details { font-size: 14px; color: #6b7280; line-height: 1.6; }
+    .reminder-note { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 16px; margin: 24px 0; font-size: 14px; color: #0369a1; }
+    .footer { background: #f9fafb; padding: 24px 32px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Fee Payment Reminder</h1>
+      <p>Application {{ application_number }} • {{ days_remaining }} day(s) remaining</p>
+    </div>
+    <div class="body">
+      <p class="greeting">Dear {{ student_name }},</p>
+      <p class="details">
+        This is a reminder about your pending fee payment for admission to <strong>{{ branch_name }}</strong>.
+      </p>
+
+      <div class="urgency-banner">
+        <strong>⚠️ Only {{ days_remaining }} day(s) remaining</strong> until the payment deadline.
+      </div>
+
+      <div class="fee-card">
+        <div class="fee-row">
+          <span class="fee-label">Branch</span>
+          <span class="fee-value">{{ branch_name }} ({{ branch_code }})</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-label">Quota</span>
+          <span class="fee-value">{{ quota }}</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-label">Base Fee</span>
+          <span class="fee-value">₹{{ fee_amount }}</span>
+        </div>
+        {% if fee_concession and fee_concession != "0" %}
+        <div class="fee-row">
+          <span class="fee-label">Concession</span>
+          <span class="fee-value" style="color: #059669;">- ₹{{ fee_concession }}</span>
+        </div>
+        {% endif %}
+        <div class="fee-row">
+          <span class="fee-label">Amount Due</span>
+          <span class="fee-value fee-total">₹{{ fee_final }}</span>
+        </div>
+      </div>
+
+      <div class="deadline-banner">
+        ⏰ Payment deadline: <strong>{{ deadline }}</strong>
+      </div>
+
+      <a href="{{ payment_link }}" class="cta">Pay Now</a>
+
+      <div class="reminder-note">
+        <strong>Reminder:</strong> This is a follow-up to your original fee notification sent on {{ original_sent_date }}.
+      </div>
+
+      <p class="details">
+        If the button above doesn't work, open the app and navigate to Fee Payment from your dashboard.
+        <br><br>
+        <strong>What happens if I miss the deadline?</strong><br>
+        Your seat allocation will be revoked and offered to the next eligible candidate.
+        If you need an extension, contact the admissions office before the deadline.
+      </p>
+    </div>
+    <div class="footer">
+      <p>This is an automated reminder from the Admissions Office.</p>
+      <p>For queries, contact {{ support_email }}</p>
+    </div>
+  </div>
+</body>
+</html>

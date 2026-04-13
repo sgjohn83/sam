@@ -1,0 +1,80 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-verified {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-locked {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.status-allocated {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.status-fee-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-admitted {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-submitted {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.status-under-review {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.status-default {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.fee-not-sent {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.fee-sent {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.fee-overdue {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.fee-paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.fee-default {
+  background: #f1f5f9;
+  color: #64748b;
+}

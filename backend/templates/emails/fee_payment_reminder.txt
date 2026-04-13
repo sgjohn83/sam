@@ -1,0 +1,29 @@
+Fee Payment Reminder
+=====================
+
+Application: {{ application_number }}
+Days Remaining: {{ days_remaining }} day(s)
+
+Dear {{ student_name }},
+
+This is a reminder about your pending fee payment for admission to {{ branch_name }}.
+
+⚠️ Only {{ days_remaining }} day(s) remaining until the payment deadline.
+
+ALLOCATION DETAILS
+- Branch: {{ branch_name }} ({{ branch_code }})
+- Quota: {{ quota }}
+- Base Fee: ₹{{ fee_amount }}
+{% if fee_concession and fee_concession != "0" %}- Concession: -₹{{ fee_concession }}
+{% endif %}- Amount Due: ₹{{ fee_final }}
+
+PAYMENT DEADLINE: {{ deadline }}
+
+Open the app to complete your payment: {{ payment_link }}
+
+REMINDER: This is a follow-up to your original fee notification sent on {{ original_sent_date }}.
+
+If you miss the deadline, your seat will be revoked and offered to the next eligible candidate.
+Contact {{ support_email }} for queries or extension requests.
+
+This is an automated reminder. Please do not reply to this email.

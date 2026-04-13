@@ -1,0 +1,40 @@
+Fee Payment Details
+===================
+
+Application Number: {{ application_number }}
+
+Dear {{ student_name }},
+
+Congratulations! You have been allocated a seat in {{ branch_name }} under {{ quota }} quota.
+
+Please find below the fee payment details:
+
+Fee Breakdown:
+--------------
+{% for item in line_items %}
+{{ item.fee_type }}: ₹{{ item.total|floatformat:2 }}
+{% endfor %}
+Total Fee: ₹{{ total|floatformat:2 }}
+{% if concession > 0 %}
+Fee Concession: - ₹{{ concession|floatformat:2 }}
+{% endif %}
+Net Payable: ₹{{ net_payable|floatformat:2 }}
+
+Payment Reference ID: {{ payment_reference }}
+
+Bank Details for Payment:
+-------------------------
+Account Name: {{ bank_details.account_name }}
+Account Number: {{ bank_details.account_number }}
+IFSC Code: {{ bank_details.ifsc_code }}
+Bank Name: {{ bank_details.bank_name }}
+
+Please include your Payment Reference ID in the payment remarks.
+
+Payment Deadline: {{ fee_deadline }}
+
+Failure to pay by the deadline may result in cancellation of your seat allocation.
+
+{{ contact_info }}
+
+This is an automated message. Please do not reply to this email.

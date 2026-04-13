@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; }
+    .header { background: #ef4444; padding: 24px; text-align: center; }
+    .header h1 { color: #fff; font-size: 20px; margin: 0; }
+    .body { padding: 32px; color: #1f2937; }
+    .reason-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 20px 0; color: #b91c1c; font-size: 14px; }
+    .details { font-size: 14px; color: #4b5563; line-height: 1.6; }
+    .footer { background: #f9fafb; padding: 20px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header"><h1>Commission Update</h1></div>
+    <div class="body">
+      <p>Dear {{ agent_name }},</p>
+      <p class="details">The commission record for student <strong>{{ student_name }}</strong> was not approved by the administration for the following reason:</p>
+      
+      <div class="reason-box">
+        {{ reason }}
+      </div>
+
+      <p class="details">If you believe this is an error or have additional documents to support this referral, please contact the coordinator at {{ coordinator_email|default:'agents@college.edu' }}.</p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2026 University Admissions Office. Administrative Update.</p>
+    </div>
+  </div>
+</body>
+</html>

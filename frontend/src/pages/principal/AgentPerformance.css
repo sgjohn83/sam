@@ -1,0 +1,259 @@
+.agent-performance-page {
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.agent-table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.agent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.agent-table thead {
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.agent-table thead tr {
+  height: 48px;
+}
+
+.agent-table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.agent-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  height: 56px;
+}
+
+.agent-table tbody tr:hover:not(.expanded-row) {
+  background: #f9fafb;
+}
+
+.agent-table tbody td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.expand-cell {
+  width: 40px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.expand-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.expand-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.agent-name {
+  font-weight: 500;
+  color: #111827;
+  min-width: 200px;
+}
+
+.agent-name strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.unverified-badge {
+  display: inline-block;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.number {
+  text-align: right;
+  color: #374151;
+  font-weight: 500;
+  min-width: 60px;
+}
+
+.conversion-rate {
+  display: inline-block;
+  min-width: 80px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  font-size: 13px;
+}
+
+.currency {
+  text-align: right;
+  color: #374151;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+/* Sort header buttons */
+.sort-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.sort-header:hover {
+  color: #111827;
+}
+
+.sort-icon {
+  font-size: 12px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.sort-icon.active {
+  opacity: 1;
+  color: #2563eb;
+}
+
+.sort-icon.inactive {
+  opacity: 0.3;
+}
+
+/* Expanded row */
+.expanded-row td {
+  padding: 0 16px;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.agent-student-summary {
+  padding: 24px;
+}
+
+.agent-student-summary h4 {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.status-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.status-count {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.summary-note {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 4px;
+}
+
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .agent-table {
+    font-size: 12px;
+  }
+
+  .agent-table tbody td {
+    padding: 8px 12px;
+  }
+
+  .status-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

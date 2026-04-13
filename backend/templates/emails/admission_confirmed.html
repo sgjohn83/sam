@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admission Confirmed</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; }
+    .header { background: linear-gradient(135deg, #059669, #047857); padding: 32px; text-align: center; }
+    .header h1 { color: #fff; font-size: 22px; margin: 0; }
+    .header p { color: rgba(255,255,255,0.85); font-size: 14px; margin: 8px 0 0; }
+    .body { padding: 32px; }
+    .greeting { font-size: 16px; color: #111827; margin-bottom: 16px; }
+    .fee-card { background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 24px; margin: 24px 0; }
+    .fee-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #bbf7d0; }
+    .fee-row:last-child { border-bottom: none; }
+    .fee-label { color: #6b7280; font-size: 14px; }
+    .fee-value { color: #111827; font-size: 14px; font-weight: 600; }
+    .success-banner { background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; padding: 16px; text-align: center; margin: 24px 0; }
+    .success-banner strong { color: #059669; font-size: 16px; }
+    .cta { display: block; background: #059669; color: #fff; text-decoration: none; text-align: center; padding: 14px 24px; border-radius: 8px; font-weight: 600;
+font-size: 16px; margin: 24px 0; }
+    .details { font-size: 14px; color: #6b7280; line-height: 1.6; }
+    .next-steps { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; margin: 24px 0; }
+    .next-steps h3 { color: #111827; margin-top: 0; font-size: 16px; }
+    .next-steps ol { padding-left: 20px; margin: 12px 0; }
+    .next-steps li { margin-bottom: 8px; }
+    .footer { background: #f9fafb; padding: 24px 32px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎓 Admission Confirmed!</h1>
+      <p>Welcome to {{ branch_name }}</p>
+    </div>
+    <div class="body">
+      <p class="greeting">Dear {{ student_name }},</p>
+      <p class="details">
+        Your fee payment has been received and your admission is now confirmed.
+        Welcome to the {{ academic_year }} academic session!
+      </p>
+
+      <div class="success-banner">
+        <strong>✅ Admission Successfully Confirmed</strong>
+      </div>
+
+      <div class="fee-card">
+        <div class="fee-row">
+          <span class="fee-label">Application Number</span>
+          <span class="fee-value">{{ application_number }}</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-label">Branch</span>
+          <span class="fee-value">{{ branch_name }} ({{ branch_code }})</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-label">Quota</span>
+          <span class="fee-value">{{ quota }}</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-label">Fee Paid</span>
+          <span class="fee-value" style="color: #059669;">₹{{ fee_paid_amount }} ✓</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-label">Admitted On</span>
+          <span class="fee-value">{{ admitted_date }}</span>
+        </div>
+      </div>
+
+      <div class="next-steps">
+        <h3>Next Steps</h3>
+        <ol class="details">
+          <li><strong>Orientation:</strong> {{ orientation_date }} at {{ orientation_venue }}</li>
+          <li><strong>Reporting Date:</strong> {{ reporting_date }}</li>
+          <li><strong>Documents to carry:</strong> Original certificates of all uploaded documents</li>
+          <li><strong>ID Card:</strong> Will be issued on the reporting date — bring a passport-size photo</li>
+        </ol>
+      </div>
+
+      <a href="{{ dashboard_link }}" class="cta">View Admission Details</a>
+
+      <p class="details">
+        <strong>Important Notes:</strong><br>
+        1. Keep this email for future reference.<br>
+        2. Bring all original documents for verification on the reporting date.<br>
+        3. For any queries, contact the admissions office at {{ support_email }}.
+      </p>
+    </div>
+    <div class="footer">
+      <p>Congratulations on your admission! We look forward to welcoming you to campus.</p>
+      <p>For queries, contact {{ support_email }}</p>
+    </div>
+  </div>
+</body>
+</html>

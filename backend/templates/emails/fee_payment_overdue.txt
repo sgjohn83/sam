@@ -1,0 +1,34 @@
+Fee Payment Overdue - URGENT
+==============================
+
+Application Number: {{ application_number }}
+
+Dear {{ student_name }},
+
+URGENT: Your fee payment for admission to {{ branch_name }} is now overdue.
+
+Fee Summary:
+------------
+Net Payable Amount: ₹{{ net_payable|floatformat:2 }}
+Payment Reference: {{ payment_reference }}
+
+Payment Deadline Was: {{ fee_deadline }}
+Days Overdue: {{ days_overdue }} days
+
+Your Payment Reference ID: {{ payment_reference }}
+
+IMMEDIATE ACTION REQUIRED:
+Your provisional seat allocation will be cancelled if payment is not received within 48 hours.
+
+To avoid cancellation:
+1. Make the payment immediately using the bank details provided in the original fee instructions
+2. Email the payment receipt to admissions@college.edu
+3. Include your Payment Reference ID in the email subject
+
+If you have already made the payment, please email your receipt immediately to secure your admission.
+
+For any payment-related queries, please contact the admissions office urgently.
+
+{{ contact_info }}
+
+This is an automated urgent notification. Please do not reply to this email.

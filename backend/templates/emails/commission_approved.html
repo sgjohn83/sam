@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; }
+    .header { background: #3b82f6; padding: 24px; text-align: center; }
+    .header h1 { color: #fff; font-size: 20px; margin: 0; }
+    .body { padding: 32px; color: #1f2937; }
+    .amount-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; }
+    .amount { font-size: 28px; font-weight: 900; color: #1d4ed8; }
+    .details { font-size: 14px; color: #4b5563; line-height: 1.6; }
+    .footer { background: #f9fafb; padding: 20px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header"><h1>Commission Approved</h1></div>
+    <div class="body">
+      <p>Dear {{ agent_name }},</p>
+      <p class="details">Great news! The commission for your referral has been reviewed and approved by the administration.</p>
+      
+      <div class="amount-card">
+        <p class="details" style="margin-bottom: 8px;">Approved Commission</p>
+        <p class="amount">₹{{ commission_amount }}</p>
+        <p class="details">For Student: <strong>{{ student_name }}</strong></p>
+      </div>
+
+      <p class="details">This amount has been added to your 'Ready to Pay' balance. Payments are processed periodically to your registered bank account.</p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2026 University Admissions Office. Internal Partner Communication.</p>
+    </div>
+  </div>
+</body>
+</html>

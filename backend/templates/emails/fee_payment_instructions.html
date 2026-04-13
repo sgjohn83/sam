@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Payment Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1e3a5f; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+        .student-info { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .student-info h3 { margin-top: 0; color: #1e3a5f; }
+        .fee-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .fee-table th, .fee-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .fee-table th { background: #1e3a5f; color: white; }
+        .fee-table .total-row { font-weight: bold; background: #e8f4f8; }
+        .fee-table .concession-row { color: #16a34a; }
+        .fee-table .net-payable-row { font-weight: bold; font-size: 1.2em; background: #1e3a5f; color: white; }
+        .payment-ref { background: #fef3c7; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; }
+        .payment-ref .ref-code { font-size: 1.5em; font-weight: bold; color: #92400e; font-family: monospace; }
+        .bank-details { background: white; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .bank-details h4 { margin-top: 0; }
+        .deadline { background: #fee2e2; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; }
+        .deadline .date { font-size: 1.3em; font-weight: bold; color: #dc2626; }
+        .footer { background: #1e3a5f; color: white; padding: 15px; text-align: center; border-radius: 0 0 8px 8px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Fee Payment Details</h1>
+        <p>Application No: {{ application_number }}</p>
+    </div>
+    
+    <div class="content">
+        <div class="student-info">
+            <h3>Dear {{ student_name }},</h3>
+            <p>Congratulations! You have been allocated a seat in <strong>{{ branch_name }}</strong> under <strong>{{ quota }}</strong> quota.</p>
+            <p>Please find below the fee payment details:</p>
+        </div>
+        
+        <table class="fee-table">
+            <thead>
+                <tr>
+                    <th>Fee Type</th>
+                    <th>Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in line_items %}
+                <tr>
+                    <td>{{ item.fee_type }}</td>
+                    <td>₹{{ item.total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td>Total Fee</td>
+                    <td>₹{{ total|floatformat:2 }}</td>
+                </tr>
+                {% if concession > 0 %}
+                <tr class="concession-row">
+                    <td>Fee Concession</td>
+                    <td>- ₹{{ concession|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+                <tr class="net-payable-row">
+                    <td>Net Payable</td>
+                    <td>₹{{ net_payable|floatformat:2 }}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="payment-ref">
+            <p>Your Payment Reference ID</p>
+            <div class="ref-code">{{ payment_reference }}</div>
+        </div>
+        
+        <div class="bank-details">
+            <h4>Bank Details for Payment</h4>
+            <p><strong>Account Name:</strong> {{ bank_details.account_name }}</p>
+            <p><strong>Account Number:</strong> {{ bank_details.account_number }}</p>
+            <p><strong>IFSC Code:</strong> {{ bank_details.ifsc_code }}</p>
+            <p><strong>Bank Name:</strong> {{ bank_details.bank_name }}</p>
+            <p><em>Please include your Payment Reference ID in the payment remarks.</em></p>
+        </div>
+        
+        <div class="deadline">
+            <p>Please complete your fee payment by</p>
+            <div class="date">{{ fee_deadline }}</div>
+            <p>Failure to pay by the deadline may result in cancellation of your seat allocation.</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>{{ contact_info }}</p>
+        <p>This is an automated message. Please do not reply to this email.</p>
+    </div>
+</body>
+</html>
