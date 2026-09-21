@@ -1,84 +1,91 @@
-# Post-revocation acceptance — finding
+# Post-revocation acceptance — finding (40 keys, two-level bootstrap)
 
-Run 2026-09-21. Assertions passed; the attack is the inversion run's, re-run
-under the same seeds, so `z'` is identical.
+Supersedes the 3-key version. Assertions passed; the attack is the
+inversion run's, re-run under the same seeds, so `z'` is identical.
 
-## The polynomial's job is revocation, and on voice it does it
+## Retraction
 
-**PRAR** — the fraction of subjects whose *old* template's reconstruction is
-still accepted after they re-enrol under fully fresh keys.
+The 3-key run reported `randproj_iom` as **firmly worse** than `polyiom` on
+voice — +4.598 pp [+1.724, +8.046] — and that was used here to claim the
+keyed polynomial specifically, rather than the dimensionality reduction,
+was doing the work.
 
-| voice, n=58, τ=37 | PRAR | 95% CI | cos to true | 95% CI |
+**That claim is withdrawn.** With 40 keys and a bootstrap over keys as well
+as identities the same contrast is −1.767 pp [−8.793, +3.967], **not
+distinguishable**. The earlier interval came from resampling the wrong
+axis and was an artifact of three draws.
+
+## What the 40 keys show
+
+| voice, n=58, τ=37 | PRAR | 95% CI | per-key med / min / max | keys failing outright |
 |---|---|---|---|---|
-| `polyiom` | **0.57%** | [0.00, 1.72] | 0.222 | [0.196, 0.247] |
-| `iom_only` | **100.00%** | [100, 100] | 0.913 | [0.910, 0.916] |
-| `randproj_iom` | 5.17% | [2.30, 8.62] | 0.490 | [0.481, 0.498] |
+| `polyiom` | 7.50% | [2.11, 14.44] | 0.00 / 0.00 / **89.66** | **2 of 40** |
+| `iom_only` | 100.00% | [100, 100] | 100 / 100 / 100 | 40 of 40 |
+| `randproj_iom` | 5.73% | [4.01, 7.63] | 6.90 / 0.00 / 13.79 | **0 of 40** |
 
-Contrasts against `polyiom`, all **FIRM**: `iom_only` +99.4 pp, `randproj_iom`
-+4.6 pp; cosine +0.691 and +0.268.
+| face, n=58, τ=68 | PRAR | 95% CI | per-key med / min / max | keys failing outright |
+|---|---|---|---|---|
+| `polyiom` | 25.60% | [13.02, 38.58] | 0.00 / 0.00 / **100.00** | **10 of 40** |
+| `iom_only` | 100.00% | [100, 100] | 100 / 100 / 100 | 40 of 40 |
+| `randproj_iom` | 2.89% | [1.77, 4.27] | 1.72 / 0.00 / 8.62 | **0 of 40** |
 
-Read plainly: **without the polynomial, revocation does not work at all.**
-Every stolen template remains a valid credential after re-keying. With it,
-0.57%. And `randproj_iom` — same dimensionality reduction, no keyed
-polynomial — is firmly worse, so this is not the dimension change doing the
-work. It is the keyed polynomial specifically.
+### Firm and robust: keyed compression is necessary
 
-This is the contribution, demonstrated. It is also the *only* thing in the
-study that the polynomial demonstrably buys.
+`iom_only` — IoM-GRP on the raw embedding — fails **completely, for all 40
+keys, on both modalities**. Every stolen template stays a valid credential
+after re-keying. Contrasts +92.5 pp (voice) and +74.4 pp (face), both FIRM.
 
-The voice result is stable across fresh keys: 0.00%, 1.72%, 0.00%.
+Whatever else is true, compressing the embedding under a key before
+hashing is what makes revocation possible at all.
 
-## The face number is not usable as reported
+### Not firm: that the polynomial is the right compression
 
-| face, n=58, τ=68 | per-key PRAR | mean |
-|---|---|---|
-| `polyiom` | 1.72%, 0.00%, **100.00%** | 33.91% |
-| `iom_only` | 100%, 100%, 100% | 100.00% |
-| `randproj_iom` | 0.00%, 3.45%, 1.72% | 1.72% |
+`polyiom` has a **bimodal failure mode**. Its median per-key PRAR is 0.00%
+on both modalities — usually revocation is perfect — but it fails
+catastrophically for a minority of fresh keys: 2 of 40 on voice (up to
+89.66%) and 10 of 40 on face (up to 100%).
 
-`polyiom`'s 33.91% is **one fresh key out of three**, not a uniform
-one-in-three failure. Two keys revoke cleanly; the third fails completely,
-with a healthy impostor floor (10.4 against a chance 8.0), so it is a real
-transfer, not a degenerate key.
+`randproj_iom` never does this. Its worst key leaks 13.79% (voice) and
+8.62% (face), and **0 of 80 keys across both modalities failed outright**.
 
-**The confidence interval on that number is wrong.** [33.33, 35.06] comes
-from bootstrapping over *identities*, and with one catastrophic key the
-identity bootstrap concentrates tightly around 1/3. The dominant uncertainty
-here is over **keys**, and there are three of them. The interval answers a
-question nobody asked.
+A scheme that revokes perfectly most of the time but fails completely one
+re-key in four is worse operationally than one that leaks a few percent
+every time, because the failure is unpredictable and total.
 
-So the firm-looking face contrast — `randproj_iom` −32.2 pp — is contaminated
-by the same single key and must not be reported.
+## randproj_iom dominates polyiom on the measured axes
 
-## What is safe to say now
+| axis | `randproj_iom` | `polyiom` | verdict |
+|---|---|---|---|
+| EER, voice | 0.700% | 1.928% | randproj better, FIRM |
+| D_sys, voice | 0.1132 | 0.0884 | not distinguishable |
+| SAR (inversion) | 100% | 100% | identical |
+| PRAR, voice | 5.73% | 7.50% | not distinguishable |
+| PRAR, face | 2.89% | 25.60% | randproj better, FIRM |
+| keys failing outright | 0 of 80 | 12 of 80 | randproj never fails |
 
-- **Voice:** revocation works with the polynomial and fails completely
-  without it. Firm, stable across keys, and `randproj_iom` rules out the
-  dimensionality explanation.
-- **Face:** revocation usually works but sometimes fails outright depending
-  on the re-issued key. Not characterised. Needs many more keys.
+Both are keyed compressions; one is linear, the other polynomial. On this
+evidence the linear map is better on accuracy, no worse on revocation
+where the data can tell, firmly better where it can, and free of the
+catastrophic failure mode.
 
-## The fix, and it is cheap
+## Revised thesis for the paper
 
-Re-run with 25–50 fresh keys and bootstrap over **keys as well as
-identities**. The expensive part is the attack, which runs once per arm; each
-additional key costs only a re-hash. The same run should report the *per-key
-distribution*, not just a mean, because "fails for 1 key in 3" and "fails
-34% of the time" are different claims and only one of them is true.
+> Keyed compression before IoM-GRP hashing is **necessary** for
+> revocability — without it every stolen template is a permanent
+> credential. A keyed random linear projection is sufficient, and on this
+> evidence preferable to the keyed polynomial: it costs 1.23 pp less EER,
+> revokes at least as reliably, and never fails outright.
 
-## Where this leaves the paper
+That is a design recommendation supported by an ablation, an attack and a
+revocation test, with the negative results making the positive one
+credible. It is not the paper that was planned, and it is a more useful
+one.
 
-Combined with the earlier runs, the arc is now complete and coherent:
+## Open question
 
-| Property | Does the polynomial help? |
-|---|---|
-| Recognition accuracy | **No** — costs 1.23 pp EER on voice (firm) |
-| Unlinkability (D_sys) | **No** — not distinguishable |
-| Inversion resistance (SAR) | **No** — 100% for every arm |
-| Protecting the raw embedding | **Yes** — cos 0.222 vs 0.913 (firm) |
-| **Revocability** | **Yes** — PRAR 0.57% vs 100% (firm, voice) |
-
-That is a publishable paper with an honest thesis: *keyed polynomial
-hardening buys revocability, not accuracy and not unlinkability, and the
-price is 1.23 pp of EER.* The ablation supplies the price tag, the inversion
-run shows what is not bought, and this run shows what is.
+Why does `polyiom` fail for a minority of fresh keys? The failing keys are
+not degenerate — all 40 passed the discrimination check on both
+modalities. The likely explanation is that a resampled key occasionally
+behaves like `K*` on the subspace the attack's `z'` occupies, but that is
+untested. If the paper leans on the catastrophic-failure claim, this
+deserves a look; if it leans on the dominance table, it does not.
