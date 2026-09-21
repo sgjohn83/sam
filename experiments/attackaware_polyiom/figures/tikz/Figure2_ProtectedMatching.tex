@@ -1,0 +1,116 @@
+% Figure 2 - protected-domain collision matching.
+%
+% Changes from the first draft:
+%  - canvas widened to 20.1cm and the vertical band matched to Figure 1, so
+%    the pair prints at one type size instead of two
+%  - the lower third of the canvas was empty and the tau* note was orphaned
+%    in the corner; both are replaced by a strip matching Figure 1's, which
+%    is where tau* gets its provenance
+%  - badge 3 sat 3mm from the end of the stage-2 label; the three stages now
+%    have room
+%  - "number of matching template positions" ran into the arrow feeding the
+%    decision diamond; it is now on its own row, and carries the worked count
+%  - the accept and reject branches had no yes/no labels
+%  - colour names no longer shadow xcolor's built-in blue/green/red
+\documentclass[tikz,border=6mm]{standalone}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta,shapes.geometric}
+
+\definecolor{ink}{HTML}{10233C}
+\definecolor{muted}{HTML}{53657A}
+\definecolor{cblue}{HTML}{0966AD}
+\definecolor{cbluef}{HTML}{DCECF8}
+\definecolor{cteal}{HTML}{087F75}
+\definecolor{ctealf}{HTML}{D9F0EC}
+\definecolor{cgreen}{HTML}{147448}
+\definecolor{cgreenf}{HTML}{DCEFE4}
+\definecolor{cred}{HTML}{A33D3D}
+\definecolor{credf}{HTML}{F4DADA}
+\definecolor{cline}{HTML}{9FB0C2}
+\definecolor{sealf}{HTML}{F2F4F7}
+
+\tikzset{
+ >={Latex[length=2.2mm,width=1.5mm]},
+ flow/.style={draw=ink!80,line width=.9pt,-{Latex[length=2.2mm,width=1.5mm]}},
+ title/.style={font=\sffamily\bfseries\fontsize{12}{13.5}\selectfont,text=ink},
+ stage/.style={font=\sffamily\bfseries\fontsize{7.3}{8.3}\selectfont,text=cblue},
+ action/.style={font=\sffamily\bfseries\fontsize{8.5}{9.5}\selectfont,text=ink,align=center},
+ tech/.style={font=\sffamily\fontsize{6.4}{7.3}\selectfont,text=muted,align=center},
+ num/.style={font=\sffamily\fontsize{6.8}{7.5}\selectfont,text=ink},
+ branch/.style={font=\sffamily\bfseries\fontsize{6.4}{7.3}\selectfont},
+ seal/.style={font=\sffamily\fontsize{6.5}{8.2}\selectfont,text=ink,align=center},
+}
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\fill[white] (0,0.85) rectangle (20.1,7.70);
+\node[title,anchor=west] at (.35,7.25) {Protected-domain collision matching};
+\draw[cline,line width=.7pt] (.35,6.82)--(19.75,6.82);
+
+% ---------- 1. the two protected templates ----------
+\fill[cblue] (.60,6.36) circle (.16);
+\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (.60,6.36) {1};
+\node[stage,anchor=west] at (.92,6.36) {PROTECTED TEMPLATES};
+
+\node[tech,text=cblue,anchor=east] at (2.40,4.85) {reference $h_{K,m}^{R}$};
+\node[tech,text=cteal,anchor=east] at (2.40,3.55) {probe $h_{K,m}^{P}$};
+
+\foreach \i/\a/\b in {0/3/3,1/1/4,2/4/4,3/2/5,4/3/3,5/1/2} {
+ \pgfmathtruncatemacro{\hit}{(\i==0)||(\i==2)||(\i==4)}
+ \ifnum\hit=1\def\ca{cgreenf}\def\da{cgreen}\else\def\ca{white}\def\da{cblue}\fi
+ \path[fill=\ca,draw=\da,line width=.65pt,rounded corners=.6mm]
+  (2.62+.70*\i,4.55) rectangle +(0.54,.60);
+ \node[num,text=\da] at (2.89+.70*\i,4.85) {\a};
+ \ifnum\hit=1\def\cb{cgreenf}\def\db{cgreen}\else\def\cb{white}\def\db{cteal}\fi
+ \path[fill=\cb,draw=\db,line width=.65pt,rounded corners=.6mm]
+  (2.62+.70*\i,3.25) rectangle +(0.54,.60);
+ \node[num,text=\db] at (2.89+.70*\i,3.55) {\b};
+ \ifnum\hit=1\draw[cgreen,line width=.8pt](2.89+.70*\i,4.53)--(2.89+.70*\i,3.87);\fi
+}
+\node[tech,text=cgreen] at (4.64,2.86)
+ {shaded columns are the positions where the two templates agree};
+
+% ---------- 2. collision score ----------
+\fill[cblue] (7.95,6.36) circle (.16);
+\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (7.95,6.36) {2};
+\node[stage,anchor=west] at (8.27,6.36) {COLLISION SCORE};
+\node[action] at (9.35,4.50)
+ {$s_m=\displaystyle\sum_{j=1}^{M_m^{*}}\mathbf{1}\!\left[h_{j}^{R}=h_{j}^{P}\right]$};
+\node[tech] at (9.35,3.36) {number of agreeing positions; here $s_m=3$};
+\draw[flow] (6.70,4.20)--(7.70,4.20);
+
+% ---------- 3. frozen threshold and decision ----------
+\fill[cblue] (12.55,6.36) circle (.16);
+\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (12.55,6.36) {3};
+\node[stage,anchor=west] at (12.87,6.36) {FROZEN THRESHOLD};
+\node[diamond,draw=ink!82,fill=white,line width=.9pt,aspect=1.53,
+ minimum width=2.60cm,minimum height=1.70cm,action] (test) at (13.60,4.20)
+ {$s_m\geq\tau_m^{*}$?};
+\draw[flow] (11.10,4.20)--(test.west);
+
+\path[fill=cgreenf,draw=cgreen,line width=.85pt,rounded corners=3mm]
+ (16.30,4.72) rectangle (18.50,5.46);
+\node[action,text=cgreen] at (17.40,5.09) {ACCEPT};
+\path[fill=credf,draw=cred,line width=.85pt,rounded corners=3mm]
+ (16.30,2.94) rectangle (18.50,3.68);
+\node[action,text=cred] at (17.40,3.31) {REJECT};
+
+\draw[flow,draw=cgreen] (14.25,4.625)--(16.30,5.09);
+\draw[flow,draw=cred]   (14.25,3.775)--(16.30,3.31);
+\node[branch,text=cgreen] at (15.30,5.13) {yes};
+\node[branch,text=cred]   at (15.30,3.27) {no};
+
+% ---------- sealed-parameter strip ----------
+\path[fill=sealf,draw=cline,line width=.7pt,rounded corners=1.2mm]
+ (.35,1.15) rectangle (19.75,2.32);
+\node[font=\sffamily\bfseries\fontsize{6.8}{8}\selectfont,text=ink]
+ at (10.05,2.02) {The threshold $\tau_m^{*}$ is chosen on development
+ identities, alongside $M_m^{*}$, $q_m^{*}$ and $o_m^{*}$ of Figure~1, and is
+ then frozen};
+\node[seal] at (10.05,1.52)
+ {Held-out and external identities are scored once at the frozen
+  $\tau_m^{*}$ \quad no re-tuning \quad no threshold fitted on the
+  evaluation data};
+
+\end{tikzpicture}
+\end{document}
