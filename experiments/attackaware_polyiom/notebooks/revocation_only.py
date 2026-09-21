@@ -16,10 +16,18 @@ The attacker never re-attacks. They hold one stolen template, reconstruct
 once, and the subject then re-enrols. That is the real revocation
 scenario.
 
-Headline metric, fixed in advance: **PRAR**, post-revocation acceptance
-rate - the fraction of subjects whose old-template reconstruction is
-accepted at the sealed threshold after full re-keying. Revocation works
-only if PRAR falls to the impostor floor.
+Headline metric: **PRAR**, post-revocation acceptance rate - the fraction
+of subjects whose old-template reconstruction is accepted at the sealed
+threshold after full re-keying. Revocation works only if PRAR falls to the
+impostor floor.
+
+The first version of this used 3 fresh keys and bootstrapped over
+identities. That was the wrong axis: with one catastrophic key out of
+three, an identity bootstrap concentrates tightly around 1/3 and reports a
+confidence interval for a question nobody asked. The dominant uncertainty
+is over KEYS. This version draws 40 and bootstraps over both, and reports
+the per-key distribution as well as the mean, because "fails for 1 key in
+3" and "fails 34% of the time" are different claims.
 
 K** is drawn to match K*'s structure by resampling its own coefficient and
 exponent values, NOT by re-running Stage A's inversion gate. For this
@@ -30,7 +38,7 @@ K** is a good key. Three independent draws guard against a fluke.
 Writes one file, runs/revocation/revocation_result.json, and no seal.
 """
 
-REV_N_KEYS = 3
+REV_N_KEYS = 40
 REV_N_BOOTSTRAP = 2000
 REV_CONFIDENCE = 0.95
 
@@ -94,15 +102,12 @@ def revocation_for(modality):
             arm, targets, key, overlap, recognition[arm], A, d,
             seed=H(S0, "INVERSION", modality, arm) % (2 ** 31))
 
-        accepted_per_key, impostor_per_key = [], []
+        accepted_per_key, impostor_per_key, degenerate = [], [], []
         for index in range(REV_N_KEYS):
             new_key, new_A, new_R = fresh_params(
                 arm, modality, index, key, M, q, d, k)
             eff_A = new_A if new_A is not None else A
             true_codes = codes_of(arm, truth, new_key, overlap, new_R, eff_A)
-            rec_codes = codes_of(arm, recovered, new_key, overlap, new_R, eff_A)
-            agree = (true_codes == rec_codes).sum(dim=-1)
-            accepted_per_key.append((agree >= tau).float().cpu().numpy())
             off = ~torch.eye(n, dtype=torch.bool, device=DEVICE)
             floor = float((true_codes[:, None, :] == true_codes[None, :, :])
                           .sum(-1)[off].float().mean())
@@ -110,28 +115,40 @@ def revocation_for(modality):
             # coefficient so hard that every power underflows, the projection
             # collapses to zero, and argmax returns bucket 0 for everyone.
             # That would read as PRAR 100% for entirely the wrong reason.
-            # A healthy key puts different subjects near the M/q chance floor.
+            # Such keys are recorded and excluded, not silently averaged in:
+            # how many there are is itself a finding about the key family.
             if floor > M / 4:
-                raise RuntimeError(
-                    f"{modality}/{arm}: fresh key {index} is degenerate - "
-                    f"different subjects collide {floor:.1f}/{M} times, "
-                    f"against a chance floor of {M / q:.1f}. The re-keyed "
-                    f"system is not discriminating, so no revocation "
-                    f"conclusion can be drawn from it."
-                )
+                degenerate.append(index)
+                continue
+            rec_codes = codes_of(arm, recovered, new_key, overlap, new_R, eff_A)
+            agree = (true_codes == rec_codes).sum(dim=-1)
+            accepted_per_key.append((agree >= tau).float().cpu().numpy())
             impostor_per_key.append(floor)
-            print(f"      re-key {index + 1}/{REV_N_KEYS}: "
-                  f"mean agreement {float(agree.float().mean()):6.1f}/{M}  "
-                  f"accepted {float((agree >= tau).float().mean()) * 100:6.2f}%"
-                  f"   impostor floor {impostor_per_key[-1]:5.1f}")
+
+        if len(accepted_per_key) < 2:
+            raise RuntimeError(
+                f"{modality}/{arm}: only {len(accepted_per_key)} of "
+                f"{REV_N_KEYS} fresh keys were usable; the key family is too "
+                f"fragile for this test to say anything."
+            )
+        matrix = np.stack(accepted_per_key)          # (usable_keys, n)
+        per_key = matrix.mean(axis=1)                # PRAR of each key
+        print(f"      {len(matrix)}/{REV_N_KEYS} keys usable"
+              f"{f' ({len(degenerate)} degenerate, excluded)' if degenerate else ''}"
+              f"   per-key PRAR: median {np.median(per_key) * 100:6.2f}%"
+              f"  min {per_key.min() * 100:6.2f}%  max {per_key.max() * 100:6.2f}%"
+              f"   keys failing outright (>50%): "
+              f"{float((per_key >= 0.5).mean()) * 100:5.1f}%")
 
         out[arm] = {
-            "prar": np.mean(np.stack(accepted_per_key), axis=0),   # per identity
+            "matrix": matrix,                          # (keys, identities)
+            "per_key": per_key,
             "cos": cosine_rows(recovered, truth).cpu().numpy(),
             "hits": hits.cpu().numpy(),
             "impostor_floor": float(np.mean(impostor_per_key)),
+            "n_degenerate": len(degenerate),
         }
-        print(f"    {arm:<13} PRAR {out[arm]['prar'].mean() * 100:6.2f}%   "
+        print(f"    {arm:<13} PRAR {matrix.mean() * 100:6.2f}%   "
               f"cos {out[arm]['cos'].mean():.3f}")
 
     return {"modality": modality, "M": M, "tau": tau, "d": d, "k": k,
@@ -168,11 +185,20 @@ def run_revocation(n_bootstrap=REV_N_BOOTSTRAP, confidence=REV_CONFIDENCE):
         stats = {a: {"PRAR": [], "cos": []} for a in ARMS}
         contrasts = {a: {"delta_PRAR": [], "delta_cos": []}
                      for a in ARMS if a != "polyiom"}
+        n_keys = min(len(record["arms"][a]["matrix"]) for a in ARMS)
+
+        # Two-level: resample KEYS and IDENTITIES in every replicate, because
+        # both vary and an identity-only bootstrap understates the spread.
+        # Key index and identity weights are shared across arms, so a contrast
+        # is paired on both.
         for _ in range(n_bootstrap):
+            picks = rng.integers(0, n_keys, size=n_keys)
             w = rng.multinomial(n, np.full(n, 1 / n)) / float(n)
-            values = {a: (float(w @ record["arms"][a]["prar"]),
-                          float(w @ record["arms"][a]["cos"])) for a in ARMS}
+            values = {}
             for a in ARMS:
+                arm_matrix = record["arms"][a]["matrix"][:n_keys]
+                values[a] = (float(np.mean(arm_matrix[picks] @ w)),
+                             float(w @ record["arms"][a]["cos"]))
                 stats[a]["PRAR"].append(values[a][0])
                 stats[a]["cos"].append(values[a][1])
             for a in contrasts:
@@ -188,17 +214,26 @@ def run_revocation(n_bootstrap=REV_N_BOOTSTRAP, confidence=REV_CONFIDENCE):
         result["modalities"][modality] = {
             "n_subjects": n, "M": record["M"], "tau": record["tau"],
             "d": record["d"], "k": record["k"],
+            "bootstrap_axes": "keys and identities",
             "arms": {a: {
-                "PRAR": float(record["arms"][a]["prar"].mean()),
+                "PRAR": float(record["arms"][a]["matrix"].mean()),
                 "PRAR_CI": interval(stats[a]["PRAR"]),
+                "per_key_PRAR": [float(x) for x in record["arms"][a]["per_key"]],
+                "per_key_median": float(np.median(record["arms"][a]["per_key"])),
+                "per_key_min": float(record["arms"][a]["per_key"].min()),
+                "per_key_max": float(record["arms"][a]["per_key"].max()),
+                "keys_failing_outright":
+                    float((record["arms"][a]["per_key"] >= 0.5).mean()),
+                "n_keys_usable": int(len(record["arms"][a]["matrix"])),
+                "n_keys_degenerate": int(record["arms"][a]["n_degenerate"]),
                 "cos_to_true": float(record["arms"][a]["cos"].mean()),
                 "cos_CI": interval(stats[a]["cos"]),
                 "impostor_floor_collisions": record["arms"][a]["impostor_floor"],
                 "attack_collisions": float(record["arms"][a]["hits"].mean()),
             } for a in ARMS},
             "contrasts_vs_polyiom": {a: {
-                "delta_PRAR": float(record["arms"][a]["prar"].mean()
-                                    - record["arms"]["polyiom"]["prar"].mean()),
+                "delta_PRAR": float(record["arms"][a]["matrix"].mean()
+                                    - record["arms"]["polyiom"]["matrix"].mean()),
                 "delta_PRAR_CI": interval(contrasts[a]["delta_PRAR"]),
                 "delta_cos": float(record["arms"][a]["cos"].mean()
                                    - record["arms"]["polyiom"]["cos"].mean()),
@@ -215,15 +250,21 @@ def revocation_report(result):
     for modality, data in result["modalities"].items():
         print(f"\n{modality.upper()}  n={data['n_subjects']}  M={data['M']}  "
               f"tau={data['tau']}")
-        print(f"  {'arm':<14}{'PRAR %':>22}{'cos to true':>26}"
-              f"{'imp floor':>11}")
+        print(f"  {'arm':<14}{'PRAR %':>22}{'per-key med/min/max %':>26}"
+              f"{'keys fail':>11}{'keys ok':>9}")
         for arm, v in data["arms"].items():
             print(f"  {arm:<14}"
                   f"{v['PRAR'] * 100:7.2f} [{v['PRAR_CI'][0] * 100:5.2f},"
                   f"{v['PRAR_CI'][1] * 100:6.2f}]"
-                  f"{v['cos_to_true']:11.3f} [{v['cos_CI'][0]:6.3f},"
-                  f"{v['cos_CI'][1]:6.3f}]"
-                  f"{v['impostor_floor_collisions']:11.1f}")
+                  f"{v['per_key_median'] * 100:9.2f}"
+                  f"{v['per_key_min'] * 100:7.2f}"
+                  f"{v['per_key_max'] * 100:7.2f}"
+                  f"{v['keys_failing_outright'] * 100:10.1f}%"
+                  f"{v['n_keys_usable']:6d}/{v['n_keys_usable'] + v['n_keys_degenerate']}")
+        print(f"  {'':14}{'cosine to true embedding':>22}")
+        for arm, v in data["arms"].items():
+            print(f"  {arm:<14}{v['cos_to_true']:11.3f} "
+                  f"[{v['cos_CI'][0]:6.3f},{v['cos_CI'][1]:6.3f}]")
         print("  contrasts (arm minus proposed; interval excluding 0 is firm)")
         for arm, c in data["contrasts_vs_polyiom"].items():
             for name, scale, unit in (("PRAR", 100, " %"), ("cos", 1, "")):
@@ -233,10 +274,13 @@ def revocation_report(result):
                       f"[{lo * scale:+7.3f},{hi * scale:+7.3f}]  {firm}")
     print("\n  PRAR is the fraction of subjects whose OLD template's")
     print("  reconstruction is still accepted after full re-keying.")
-    print("  Revocation WORKS only if PRAR falls to near zero. A PRAR near")
-    print("  100% means a single stolen template is a permanent credential.")
-    print("  'imp floor' is the mean collision count between different")
-    print("  subjects under the new keys, for scale against tau.")
+    print("  Intervals resample BOTH keys and identities.")
+    print("  'keys fail' is the share of fresh keys for which revocation")
+    print("  fails outright (PRAR >= 50%) - the number to quote when the")
+    print("  per-key spread is wide, because a mean over keys hides it.")
+    print("  'keys ok' counts keys that stayed discriminating; degenerate")
+    print("  ones are excluded, and a large exclusion count is itself a")
+    print("  finding about how fragile the key family is.")
 
 
 print("Revocation evaluation ready.")

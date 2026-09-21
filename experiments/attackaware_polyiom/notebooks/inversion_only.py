@@ -151,7 +151,7 @@ def invert_arm(arm, targets, key, overlap, tensor, A, d, seed,
         best_hits = torch.where(improved, hits, best_hits)
         best_z[improved] = z.detach()[improved]
         print(f"      {arm:<13} restart {restart + 1}/{restarts}  "
-              f"loss {float(loss):7.4f}  best mean hits "
+              f"loss {float(loss.detach()):7.4f}  best mean hits "
               f"{float(best_hits.float().mean()):7.2f}")
 
     return best_z, best_hits
