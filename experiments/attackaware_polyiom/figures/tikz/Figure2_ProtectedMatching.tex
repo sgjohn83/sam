@@ -1,116 +1,90 @@
-% Figure 2 - protected-domain collision matching.
-%
-% Changes from the first draft:
-%  - canvas widened to 20.1cm and the vertical band matched to Figure 1, so
-%    the pair prints at one type size instead of two
-%  - the lower third of the canvas was empty and the tau* note was orphaned
-%    in the corner; both are replaced by a strip matching Figure 1's, which
-%    is where tau* gets its provenance
-%  - badge 3 sat 3mm from the end of the stage-2 label; the three stages now
-%    have room
-%  - "number of matching template positions" ran into the arrow feeding the
-%    decision diamond; it is now on its own row, and carries the worked count
-%  - the accept and reject branches had no yes/no labels
-%  - colour names no longer shadow xcolor's built-in blue/green/red
-\documentclass[tikz,border=6mm]{standalone}
-\usepackage{amsmath}
-\usetikzlibrary{arrows.meta,shapes.geometric}
+% Figure 2 - the comparison, drawn. The threshold is a position on a scale,
+% not a word in a box, so accept and reject are regions you can see.
+% 18.0cm = 7.09in wide, prints at \textwidth unscaled.
+\documentclass[tikz,border=2mm]{standalone}
+\usepackage{amsmath,graphicx}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing}
 
 \definecolor{ink}{HTML}{10233C}
-\definecolor{muted}{HTML}{53657A}
+\definecolor{muted}{HTML}{5C6E84}
 \definecolor{cblue}{HTML}{0966AD}
-\definecolor{cbluef}{HTML}{DCECF8}
 \definecolor{cteal}{HTML}{087F75}
-\definecolor{ctealf}{HTML}{D9F0EC}
 \definecolor{cgreen}{HTML}{147448}
-\definecolor{cgreenf}{HTML}{DCEFE4}
-\definecolor{cred}{HTML}{A33D3D}
-\definecolor{credf}{HTML}{F4DADA}
-\definecolor{cline}{HTML}{9FB0C2}
-\definecolor{sealf}{HTML}{F2F4F7}
+\definecolor{cgreenf}{HTML}{D7EDDF}
+\definecolor{cred}{HTML}{B03A34}
+\definecolor{credf}{HTML}{F7DEDC}
+\definecolor{cline}{HTML}{AEBCCC}
 
 \tikzset{
- >={Latex[length=2.2mm,width=1.5mm]},
- flow/.style={draw=ink!80,line width=.9pt,-{Latex[length=2.2mm,width=1.5mm]}},
- title/.style={font=\sffamily\bfseries\fontsize{12}{13.5}\selectfont,text=ink},
- stage/.style={font=\sffamily\bfseries\fontsize{7.3}{8.3}\selectfont,text=cblue},
- action/.style={font=\sffamily\bfseries\fontsize{8.5}{9.5}\selectfont,text=ink,align=center},
- tech/.style={font=\sffamily\fontsize{6.4}{7.3}\selectfont,text=muted,align=center},
- num/.style={font=\sffamily\fontsize{6.8}{7.5}\selectfont,text=ink},
- branch/.style={font=\sffamily\bfseries\fontsize{6.4}{7.3}\selectfont},
- seal/.style={font=\sffamily\fontsize{6.5}{8.2}\selectfont,text=ink,align=center},
+ flow/.style={draw=ink!70,line width=1pt,-{Latex[length=2.6mm,width=1.9mm]}},
+ grn/.style={draw=cgreen,line width=1.1pt,-{Latex[length=2.6mm,width=1.9mm]}},
+ head/.style={font=\sffamily\bfseries\fontsize{9}{10.5}\selectfont,text=ink},
+ lab/.style={font=\sffamily\fontsize{8}{9.5}\selectfont,text=muted,align=center},
+ cell/.style={font=\sffamily\bfseries\fontsize{9}{10}\selectfont},
+ dig/.style={font=\sffamily\fontsize{6.4}{7}\selectfont,text=muted},
 }
-
 \begin{document}
 \begin{tikzpicture}[x=1cm,y=1cm]
-\fill[white] (0,0.85) rectangle (20.1,7.70);
-\node[title,anchor=west] at (.35,7.25) {Protected-domain collision matching};
-\draw[cline,line width=.7pt] (.35,6.82)--(19.75,6.82);
+\fill[white] (0,4.45) rectangle (18.0,9.05);
+\node[font=\sffamily\bfseries\fontsize{12}{14}\selectfont,text=ink,anchor=west]
+ at (.55,8.68) {Comparing two protected templates};
+\node[head,anchor=west,text=cblue]  at (.55,8.14) {1\ \ line up};
+\node[head,anchor=west,text=cgreen] at (7.30,8.14) {2\ \ count};
+\node[head,anchor=west,text=ink]    at (11.00,8.14) {3\ \ frozen threshold};
 
-% ---------- 1. the two protected templates ----------
-\fill[cblue] (.60,6.36) circle (.16);
-\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (.60,6.36) {1};
-\node[stage,anchor=west] at (.92,6.36) {PROTECTED TEMPLATES};
+% ---------------- the two templates ----------------
+\node at (1.10,7.16) {\includegraphics[width=1.15cm]%
+ {assets/imagegen_verified/biometric_evidence.png}};
+\node at (1.10,5.60) {\includegraphics[width=1.15cm]%
+ {assets/imagegen_verified/biometric_evidence.png}};
+\node[lab,text=cblue] at (1.10,6.42) {enrolled};
+\node[lab,text=cteal] at (1.10,4.86) {new sample};
+\draw[flow] (1.86,7.16)--(2.34,7.16);
+\draw[flow] (1.86,5.60)--(2.34,5.60);
 
-\node[tech,text=cblue,anchor=east] at (2.40,4.85) {reference $h_{K,m}^{R}$};
-\node[tech,text=cteal,anchor=east] at (2.40,3.55) {probe $h_{K,m}^{P}$};
+\foreach \i/\a/\b in {0/3/3,1/1/1,2/4/4,3/2/5,4/3/3,5/1/2,6/4/4}{
+ \pgfmathtruncatemacro{\hit}{\a==\b}
+ \ifnum\hit=1\def\fa{cgreenf}\def\da{cgreen}\else\def\fa{white}\def\da{cblue}\fi
+ \path[fill=\fa,draw=\da,line width=.9pt,rounded corners=.7mm]
+  (2.56+.58*\i,6.91) rectangle +(0.50,.50);
+ \node[cell,text=\da] at (2.81+.58*\i,7.16) {\a};
+ \ifnum\hit=1\def\fb{cgreenf}\def\db{cgreen}\else\def\fb{white}\def\db{cteal}\fi
+ \path[fill=\fb,draw=\db,line width=.9pt,rounded corners=.7mm]
+  (2.56+.58*\i,5.35) rectangle +(0.50,.50);
+ \node[cell,text=\db] at (2.81+.58*\i,5.60) {\b};
+ \ifnum\hit=1\draw[cgreen,line width=1.1pt](2.81+.58*\i,6.89)--(2.81+.58*\i,5.87);\fi}
 
-\foreach \i/\a/\b in {0/3/3,1/1/4,2/4/4,3/2/5,4/3/3,5/1/2} {
- \pgfmathtruncatemacro{\hit}{(\i==0)||(\i==2)||(\i==4)}
- \ifnum\hit=1\def\ca{cgreenf}\def\da{cgreen}\else\def\ca{white}\def\da{cblue}\fi
- \path[fill=\ca,draw=\da,line width=.65pt,rounded corners=.6mm]
-  (2.62+.70*\i,4.55) rectangle +(0.54,.60);
- \node[num,text=\da] at (2.89+.70*\i,4.85) {\a};
- \ifnum\hit=1\def\cb{cgreenf}\def\db{cgreen}\else\def\cb{white}\def\db{cteal}\fi
- \path[fill=\cb,draw=\db,line width=.65pt,rounded corners=.6mm]
-  (2.62+.70*\i,3.25) rectangle +(0.54,.60);
- \node[num,text=\db] at (2.89+.70*\i,3.55) {\b};
- \ifnum\hit=1\draw[cgreen,line width=.8pt](2.89+.70*\i,4.53)--(2.89+.70*\i,3.87);\fi
-}
-\node[tech,text=cgreen] at (4.64,2.86)
- {shaded columns are the positions where the two templates agree};
+% ---------------- the count ----------------
+\draw[grn] (6.62,6.38)--(7.42,6.38);
+\path[fill=cgreenf,draw=cgreen,line width=1.3pt,rounded corners=1.2mm]
+ (7.56,5.83) rectangle (8.76,6.93);
+\node[font=\sffamily\bfseries\fontsize{17}{18}\selectfont,text=cgreen]
+ at (8.16,6.38) {5};
+\node[lab,text=cgreen] at (8.16,5.55) {matches};
 
-% ---------- 2. collision score ----------
-\fill[cblue] (7.95,6.36) circle (.16);
-\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (7.95,6.36) {2};
-\node[stage,anchor=west] at (8.27,6.36) {COLLISION SCORE};
-\node[action] at (9.35,4.50)
- {$s_m=\displaystyle\sum_{j=1}^{M_m^{*}}\mathbf{1}\!\left[h_{j}^{R}=h_{j}^{P}\right]$};
-\node[tech] at (9.35,3.36) {number of agreeing positions; here $s_m=3$};
-\draw[flow] (6.70,4.20)--(7.70,4.20);
+% ---------------- the frozen threshold, as a scale ----------------
+\path[fill=credf,draw=none]   (11.00,6.10) rectangle (14.20,6.62);
+\path[fill=cgreenf,draw=none] (14.20,6.10) rectangle (16.60,6.62);
+\draw[cline,line width=.9pt] (11.00,6.10) rectangle (16.60,6.62);
+\foreach \k in {0,...,7}{
+ \draw[cline,line width=.7pt] (11.00+.80*\k,6.10)--(11.00+.80*\k,5.96);
+ \ifnum\k=5\else\node[dig] at (11.00+.80*\k,5.78) {\k};\fi}
 
-% ---------- 3. frozen threshold and decision ----------
-\fill[cblue] (12.55,6.36) circle (.16);
-\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (12.55,6.36) {3};
-\node[stage,anchor=west] at (12.87,6.36) {FROZEN THRESHOLD};
-\node[diamond,draw=ink!82,fill=white,line width=.9pt,aspect=1.53,
- minimum width=2.60cm,minimum height=1.70cm,action] (test) at (13.60,4.20)
- {$s_m\geq\tau_m^{*}$?};
-\draw[flow] (11.10,4.20)--(test.west);
+\draw[ink,line width=1.3pt,dash pattern=on 2pt off 1.6pt] (14.20,5.92)--(14.20,7.00);
+\node[font=\sffamily\bfseries\fontsize{10}{11}\selectfont,text=ink]
+ at (14.28,7.26) {$\tau^{*}$};
+\begin{scope}[shift={(13.82,7.24)}]
+ \draw[ink,line width=.9pt] (-.075,.045) arc (180:0:.075);
+ \path[fill=ink,rounded corners=.3pt] (-.125,-.125) rectangle (.125,.055);
+\end{scope}
+\node[font=\sffamily\bfseries\fontsize{9.5}{11}\selectfont,text=cred]
+ at (12.60,7.24) {REJECT};
+\node[font=\sffamily\bfseries\fontsize{9.5}{11}\selectfont,text=cgreen]
+ at (15.40,7.24) {ACCEPT};
 
-\path[fill=cgreenf,draw=cgreen,line width=.85pt,rounded corners=3mm]
- (16.30,4.72) rectangle (18.50,5.46);
-\node[action,text=cgreen] at (17.40,5.09) {ACCEPT};
-\path[fill=credf,draw=cred,line width=.85pt,rounded corners=3mm]
- (16.30,2.94) rectangle (18.50,3.68);
-\node[action,text=cred] at (17.40,3.31) {REJECT};
-
-\draw[flow,draw=cgreen] (14.25,4.625)--(16.30,5.09);
-\draw[flow,draw=cred]   (14.25,3.775)--(16.30,3.31);
-\node[branch,text=cgreen] at (15.30,5.13) {yes};
-\node[branch,text=cred]   at (15.30,3.27) {no};
-
-% ---------- sealed-parameter strip ----------
-\path[fill=sealf,draw=cline,line width=.7pt,rounded corners=1.2mm]
- (.35,1.15) rectangle (19.75,2.32);
-\node[font=\sffamily\bfseries\fontsize{6.8}{8}\selectfont,text=ink]
- at (10.05,2.02) {The threshold $\tau_m^{*}$ is chosen on development
- identities, alongside $M_m^{*}$, $q_m^{*}$ and $o_m^{*}$ of Figure~1, and is
- then frozen};
-\node[seal] at (10.05,1.52)
- {Held-out and external identities are scored once at the frozen
-  $\tau_m^{*}$ \quad no re-tuning \quad no threshold fitted on the
-  evaluation data};
+% the score lands on the scale
+\draw[grn] (8.16,5.81)--(8.16,5.18)--(15.00,5.18)--(15.00,6.22);
+\fill[cgreen] (15.00,6.36) circle (.14);
 
 \end{tikzpicture}
 \end{document}

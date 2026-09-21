@@ -1,160 +1,110 @@
-% Figure 1 - attack-aware PolyIoM protected-template generation.
-%
-% Changes from the first draft:
-%  - the lower ~2.4cm of the canvas was empty; it now carries a strip that
-%    gives the starred parameters their provenance (selected once on
-%    development identities, then frozen), which also ties this figure to
-%    Figure 2's tau*
-%  - the hardening module read "values -> key -> y", which inverts the
-%    mechanism; the key is an input to the transform, so the group and the
-%    key now both feed P_{K*}(.;o*) and y comes out of it
-%  - the two captions under stage 4 overlapped and the right-hand one ran
-%    past the canvas edge; they are now on separate rows
-%  - stage badge 2 was 4mm from the end of the stage-1 label
-%  - colour names no longer shadow xcolor's built-in blue/green/red
-
-\documentclass[tikz,border=6mm]{standalone}
+% Figure 1 - the mechanism, drawn.
+% The sliding window is shown by repeating the vector once per window
+% position; the key, the irreversibility and the argmax are all geometry.
+% 18.0cm = 7.09in wide, prints at \textwidth unscaled.
+\documentclass[tikz,border=2mm]{standalone}
 \usepackage{amsmath,graphicx}
-\usetikzlibrary{arrows.meta}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing}
 
 \definecolor{ink}{HTML}{10233C}
-\definecolor{muted}{HTML}{53657A}
+\definecolor{muted}{HTML}{5C6E84}
 \definecolor{cblue}{HTML}{0966AD}
-\definecolor{cbluef}{HTML}{DCECF8}
-\definecolor{cteal}{HTML}{087F75}
-\definecolor{ctealf}{HTML}{D9F0EC}
+\definecolor{camber}{HTML}{B65D00}
+\definecolor{camberf}{HTML}{FDEFD9}
 \definecolor{cgreen}{HTML}{147448}
 \definecolor{cgreenf}{HTML}{DCEFE4}
-\definecolor{camber}{HTML}{B65D00}
-\definecolor{camberf}{HTML}{FCE8C5}
-\definecolor{cline}{HTML}{9FB0C2}
-\definecolor{sealf}{HTML}{F2F4F7}
+\definecolor{cred}{HTML}{B03A34}
+\definecolor{cline}{HTML}{AEBCCC}
 
 \tikzset{
- >={Latex[length=2.2mm,width=1.5mm]},
- flow/.style={draw=ink!80,line width=.9pt,-{Latex[length=2.2mm,width=1.5mm]}},
- feed/.style={draw=camber!85,line width=.6pt,-{Latex[length=1.6mm,width=1.1mm]}},
- title/.style={font=\sffamily\bfseries\fontsize{12}{13.5}\selectfont,text=ink},
- stage/.style={font=\sffamily\bfseries\fontsize{7.3}{8.3}\selectfont,text=cblue},
- action/.style={font=\sffamily\bfseries\fontsize{8.5}{9.5}\selectfont,text=ink,align=center},
- tech/.style={font=\sffamily\fontsize{6.4}{7.3}\selectfont,text=muted,align=center},
- num/.style={font=\sffamily\fontsize{6.5}{7.2}\selectfont,text=ink},
- seal/.style={font=\sffamily\fontsize{6.5}{8.2}\selectfont,text=ink,align=center},
+ flow/.style={draw=ink!70,line width=1pt,-{Latex[length=2.6mm,width=1.9mm]}},
+ amb/.style={draw=camber,line width=1pt,-{Latex[length=2.4mm,width=1.7mm]}},
+ grn/.style={draw=cgreen,line width=1pt,-{Latex[length=2.4mm,width=1.7mm]}},
+ head/.style={font=\sffamily\bfseries\fontsize{9}{10.5}\selectfont,text=ink},
+ lab/.style={font=\sffamily\fontsize{8}{9.5}\selectfont,text=muted,align=center},
+ dig/.style={font=\sffamily\fontsize{6.4}{7}\selectfont,text=muted},
 }
-
 \begin{document}
 \begin{tikzpicture}[x=1cm,y=1cm]
-\fill[white] (0,0.85) rectangle (20.1,7.70);
-\node[title,anchor=west] at (.35,7.25) {Attack-aware PolyIoM protected-template generation};
-\draw[cline,line width=.7pt] (.35,6.82)--(19.75,6.82);
+\fill[white] (0,3.80) rectangle (18.0,9.05);
+\node[font=\sffamily\bfseries\fontsize{12}{14}\selectfont,text=ink,anchor=west]
+ at (.55,8.68) {Building a protected template};
+\node[head,anchor=west,text=camber] at (.55,8.14) {1\ \ keyed polynomial};
+\node[head,anchor=west,text=cgreen] at (10.30,8.14) {2\ \ winning bucket per group};
 
-% ---------- 1. biometric input ----------
-\fill[cblue] (.60,6.36) circle (.16);
-\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (.60,6.36) {1};
-\node[stage,anchor=west] at (.92,6.36) {BIOMETRIC INPUT};
-\node at (1.75,4.78)
- {\includegraphics[width=2.25cm]{assets/imagegen_verified/biometric_evidence.png}};
-\node[action] at (1.75,3.48) {Face image or\\voice utterance $x_m$};
+% ---------------- the sample feeds one vector ----------------
+\node at (1.15,6.61) {\includegraphics[width=1.45cm]%
+ {assets/imagegen_verified/biometric_evidence.png}};
+\draw[flow] (1.92,6.61)--(2.14,6.61);
+\draw[decorate,decoration={brace,amplitude=3.5pt},ink!60,line width=.85pt]
+ (2.26,7.44)--(2.26,5.78);
 
-% ---------- 2. frozen encoder and embedding ----------
-\fill[cblue] (4.05,6.36) circle (.16);
-\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (4.05,6.36) {2};
-\node[stage,anchor=west] at (4.37,6.36) {FROZEN ENCODER};
-\node[action] at (5.25,5.45) {$z_m=f_m(x_m)$};
-\path[fill=white,draw=cblue,line width=.8pt,rounded corners=.8mm]
- (3.72,4.23) rectangle (6.78,4.97);
-\foreach \i/\v in {0/.42,1/-.18,2/.73,3/.05,4/-.61,5/.31} {
- \node[num] at (4.02+.43*\i,4.60) {\v};
- \ifnum\i<5\draw[cline,line width=.42pt](4.235+.43*\i,4.31)--(4.235+.43*\i,4.90);\fi
-}
-\node[tech] at (5.25,3.83) {$d_f=512$; $d_v=192$};
-\draw[flow] (2.86,4.60)--(3.45,4.60);
+% ---------------- the same vector, three window positions ----------------
+\foreach \r/\y/\w in {0/7.00/0,1/6.40/3,2/5.80/6}{
+ \foreach \i/\t in {0/45,1/18,2/62,3/30,4/74,5/22,6/55,7/38,8/68,9/26,
+                    10/50,11/34}{
+  \path[fill=cblue!\t,draw=cblue!55,line width=.4pt]
+   (2.40+.335*\i,\y) rectangle +(0.28,.42);}
+ \path[draw=camber,line width=1.2pt,rounded corners=.9mm]
+  (2.34+.335*\w,\y-.055) rectangle +(1.47,.53);
+ \draw[amb] (6.47,\y+.21)--(6.86,\y+.21);
+ \path[fill=camberf,draw=camber,line width=.9pt,rounded corners=.7mm]
+  (8.72,\y-.01) rectangle +(0.52,.44);
+ \draw[amb] (8.32,\y+.21)--(8.70,\y+.21);}
 
-% ---------- 3. keyed polynomial hardening ----------
-\fill[camber] (7.48,6.36) circle (.16);
-\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (7.48,6.36) {3};
-\node[stage,text=camber,anchor=west] at (7.80,6.36) {KEYED POLYNOMIAL HARDENING};
+% ---------------- the keyed polynomial ----------------
+\path[fill=camberf,draw=camber,line width=1.2pt,rounded corners=1.4mm]
+ (6.90,5.72) rectangle (8.30,7.50);
+\node[font=\sffamily\fontsize{10.5}{12}\selectfont,text=camber] at (7.60,6.61)
+ {$P_{K^{*}}$};
 
-\path[fill=camberf,draw=camber,line width=1pt,rounded corners=2mm]
- (7.45,2.80) rectangle (12.88,5.72);
-\node[action,text=camber] at (10.17,5.35) {Proposed attack-aware module};
-\node[tech,text=camber] at (10.17,5.00) {five-value groups; overlap $o_m^{*}$};
+\begin{scope}[shift={(7.24,8.02)},draw=camber,line width=1.1pt]
+ \draw (0,0) circle (.15);
+ \draw (.14,0)--(.74,0);
+ \draw (.52,0)--(.52,-.17);
+ \draw (.69,0)--(.69,-.14);
+\end{scope}
+\node[lab,text=camber,anchor=west] at (8.12,8.02) {key $K^{*}$};
+\draw[amb] (7.24,7.82)--(7.24,7.54);
 
-% the five-value group taken from the embedding
-\foreach \i/\v in {0/.42,1/-.18,2/.73,3/.05,4/-.61} {
- \path[fill=white,draw=camber,line width=.6pt,rounded corners=.5mm]
-  (8.835+.56*\i,4.33) rectangle +(0.43,.47);
- \node[num] at (9.05+.56*\i,4.565) {\v};
- \draw[feed] (9.05+.56*\i,4.33)--(10.17,4.13);
-}
+\node[font=\sffamily\bfseries\fontsize{8}{9}\selectfont,text=camber]
+ at (8.98,5.52) {$\vdots$};
 
-% key -> transform -> output
-\path[fill=white,draw=camber,line width=.75pt,rounded corners=.8mm]
- (7.62,3.52) rectangle (8.82,4.06);
-\node[font=\sffamily\bfseries\fontsize{6.2}{7}\selectfont,text=camber]
- at (8.22,3.79) {key $K^{*}$};
+% ---------------- there is no way back ----------------
+\draw[cline,line width=1pt,dash pattern=on 1.8pt off 1.5pt,
+      -{Latex[length=2.2mm,width=1.7mm]}] (8.72,5.22)--(2.45,5.22);
+\fill[white] (5.60,5.22) circle (.24);
+\draw[cred,line width=1.5pt] (5.45,5.07)--(5.75,5.37);
+\draw[cred,line width=1.5pt] (5.75,5.07)--(5.45,5.37);
+\node[lab,text=cred] at (5.60,4.74) {no way back};
 
-\path[fill=white,draw=camber,line width=.9pt,rounded corners=1mm]
- (9.07,3.52) rectangle (11.27,4.06);
-\node[font=\sffamily\fontsize{7}{8}\selectfont,text=camber]
- at (10.17,3.79) {$P_{K^{*}}(\,\cdot\,;o_m^{*})$};
+% ---------------- hand-off ----------------
+\draw[flow] (9.30,6.61)--(10.05,6.30);
+\fill[ink!70] (10.05,6.30) circle (.07);
 
-\path[fill=white,draw=camber,line width=.75pt,rounded corners=.8mm]
- (11.52,3.52) rectangle (12.62,4.06);
-\node[num,text=camber] at (12.07,3.79) {$y_j$};
+% ---------------- q buckets per group, tallest wins ----------------
+\foreach \g/\y/\w in {0/7.10/2,1/5.75/0,2/4.40/3}{
+ \draw[flow] (10.13,6.30)--(11.52,\y+.36);
+ \foreach \k/\h in {0/.28,1/.45,2/.70,3/.36}{
+  \pgfmathtruncatemacro{\isw}{\k==\w}
+  \ifnum\isw=1\def\bh{.75}\def\bc{cgreen}\else\def\bh{\h}\def\bc{cgreen!25}\fi
+  \path[fill=\bc,draw=cgreen,line width=.5pt]
+   (11.70+.52*\k,\y) rectangle +(0.34,\bh);
+  \node[dig] at (11.87+.52*\k,\y-.24) {\number\numexpr\k+1\relax};}
+ \draw[cgreen!70,line width=.8pt] (11.60,\y)--(13.70,\y);
+ \pgfmathtruncatemacro{\wi}{\w+1}
+ \draw[grn] (13.80,\y+.32)--(14.26,\y+.32);
+ \path[fill=cgreenf,draw=cgreen,line width=1.1pt,rounded corners=.8mm]
+  (14.36,\y+.02) rectangle +(0.70,.62);
+ \node[font=\sffamily\bfseries\fontsize{10.5}{12}\selectfont,text=cgreen]
+  at (14.71,\y+.33) {\wi};}
+\node[font=\sffamily\bfseries\fontsize{8}{9}\selectfont,text=cgreen]
+ at (14.71,4.06) {$\vdots$};
 
-\draw[feed] (8.82,3.79)--(9.07,3.79);
-\draw[feed] (11.27,3.79)--(11.52,3.79);
-\node[tech,text=camber] at (10.17,3.16) {$y_m=P_{K^{*}}(z_m;o_m^{*})$};
-\draw[flow] (6.78,4.60)--(7.26,4.60);
-
-% ---------- 4. IoM-GRP protected template ----------
-\fill[cteal] (13.62,6.36) circle (.16);
-\node[font=\sffamily\bfseries\fontsize{6.5}{7}\selectfont,text=white] at (13.62,6.36) {4};
-\node[stage,text=cteal,anchor=west] at (13.94,6.36) {IoM--GRP PROTECTED TEMPLATE};
-\node[action] at (15.60,5.45) {Argmax index per group};
-
-\draw[cteal!75,line width=.65pt] (13.72,3.93)--(14.80,3.93);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (13.80,3.93) rectangle +(0.15,.45);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (14.03,3.93) rectangle +(0.15,.76);
-\path[fill=cgreen,draw=cteal,line width=.45pt] (14.26,3.93) rectangle +(0.15,1.08);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (14.49,3.93) rectangle +(0.15,.58);
-
-\draw[cteal!75,line width=.65pt] (15.06,3.93)--(16.14,3.93);
-\path[fill=cgreen,draw=cteal,line width=.45pt] (15.14,3.93) rectangle +(0.15,1.08);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (15.37,3.93) rectangle +(0.15,.54);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (15.60,3.93) rectangle +(0.15,.80);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (15.83,3.93) rectangle +(0.15,.43);
-
-\draw[cteal!75,line width=.65pt] (16.40,3.93)--(17.48,3.93);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (16.48,3.93) rectangle +(0.15,.52);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (16.71,3.93) rectangle +(0.15,.76);
-\path[fill=cteal!28,draw=cteal,line width=.45pt] (16.94,3.93) rectangle +(0.15,.61);
-\path[fill=cgreen,draw=cteal,line width=.45pt] (17.17,3.93) rectangle +(0.15,1.05);
-\node[tech,text=cteal] at (15.60,3.55)
- {$M_m^{*}$ groups of $q_m^{*}$ projections; tallest wins};
-\draw[flow] (12.88,4.30)--(13.44,4.30);
-
-\path[fill=cgreenf,draw=cgreen,line width=.85pt,rounded corners=1mm]
- (17.90,4.15) rectangle (19.70,4.92);
-\foreach \i/\v in {0/3,1/1,2/4} {
- \node[font=\sffamily\bfseries\fontsize{7}{8}\selectfont,text=cgreen] at (18.27+.48*\i,4.535) {\v};
- \ifnum\i<2\draw[cgreen!45,line width=.45pt](18.51+.48*\i,4.23)--(18.51+.48*\i,4.84);\fi
-}
-\node[tech,text=cgreen,anchor=east] at (19.70,3.22)
- {$h_{K,m}\in\{1,\ldots,q_m^{*}\}^{M_m^{*}}$};
-\draw[flow] (17.48,4.54)--(17.76,4.54);
-
-% ---------- sealed-parameter strip ----------
-\path[fill=sealf,draw=cline,line width=.7pt,rounded corners=1.2mm]
- (.35,1.15) rectangle (19.75,2.32);
-\node[font=\sffamily\bfseries\fontsize{6.8}{8}\selectfont,text=ink]
- at (10.05,2.02) {Every starred quantity is selected once on development
- identities, then frozen for all held-out and external evaluation};
-\node[seal] at (10.05,1.52)
- {$K^{*}$ polynomial key \quad $o_m^{*}$ group overlap \quad
-  $M_m^{*}$ groups \quad $q_m^{*}$ projections per group \quad
-  $\tau_m^{*}$ decision threshold (Figure 2)};
+\draw[decorate,decoration={brace,amplitude=4.5pt},cgreen,line width=.9pt]
+ (15.24,7.78)--(15.24,4.30);
+\node[head,text=cgreen,anchor=west,align=left] at (15.62,6.04)
+ {protected\\template};
 
 \end{tikzpicture}
 \end{document}
