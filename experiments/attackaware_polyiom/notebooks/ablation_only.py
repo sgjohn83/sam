@@ -1,78 +1,14 @@
-"""Emit AttackAware_PolyIoM_v1_1_4_ABLATION.ipynb.
+"""Self-contained ablation runtime for AttackAware PolyIoM v1.1.4.
 
-Self-contained, in the same shape as HELDOUT_CONFIDENCE.ipynb: it rebuilds
-the frozen score histograms from the stored embeddings and keys, so it has
-no dependency on the consolidated notebook.
+Loaded by AttackAware_PolyIoM_v1_1_4_ABLATION.ipynb after its preflight cell
+has defined PROJECT, DIR, S0, G, DEVICE, the embedding paths, HELDOUT_RESULTS
+and ABLATION_OUTPUT.
+
+Rebuilds the frozen score histograms from the stored embeddings and keys, so
+it depends on no other notebook. Writes one file, runs/ablation/
+ablation_result.json, and no seal.
 """
-import json
-from pathlib import Path
 
-C1 = r'''#@title 1. Mount Drive and verify the ablation inputs
-from google.colab import drive
-drive.mount("/content/drive")
-
-import hashlib, json, math, os
-from pathlib import Path
-
-import numpy as np
-import pandas as pd
-import torch
-from IPython.display import display
-
-PROJECT = Path("/content/drive/MyDrive/AttackAware_PolyIoM_v1_1_4")
-DIR = {
-    "protocol": PROJECT / "protocol",
-    "embeddings": PROJECT / "embeddings",
-    "runs": PROJECT / "runs",
-    "seal": PROJECT / "seal",
-}
-S0, G = 2026, 5
-DEVICE = torch.device("cpu")
-
-LFW_FACE_TRIALS = DIR["protocol"] / "lfw_face_trials.tsv"
-LFW_EMB = DIR["embeddings"] / "lfw_all_valid_embeddings.npz"
-LIBRI_MANIFEST = DIR["protocol"] / "librispeech_internal.tsv"
-LIBRI_EMB = DIR["embeddings"] / "librispeech_internal_embeddings.npz"
-
-HELDOUT_RESULTS = {
-    modality: DIR["runs"] / "heldout" / modality / "heldout_result.json"
-    for modality in ("face", "voice")
-}
-ABLATION_OUTPUT = DIR["runs"] / "ablation" / "ablation_result.json"
-
-REQUIRED = [
-    LFW_FACE_TRIALS, LFW_EMB, LIBRI_MANIFEST, LIBRI_EMB,
-    DIR["runs"] / "key_search/face/selected_key.json",
-    DIR["runs"] / "key_search/voice/selected_key.json",
-    HELDOUT_RESULTS["face"], HELDOUT_RESULTS["voice"],
-]
-missing = [str(p.relative_to(PROJECT)) for p in REQUIRED if not p.is_file()]
-if missing:
-    raise FileNotFoundError(
-        "Ablation cannot start; required frozen artefacts are missing:\n- "
-        + "\n- ".join(missing)
-    )
-
-torch.use_deterministic_algorithms(True, warn_only=False)
-if hasattr(torch.backends, "cudnn"):
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
-
-TENSOR_DIR = DIR["runs"] / "iom_tensors"
-if not TENSOR_DIR.is_dir():
-    raise FileNotFoundError(
-        f"Frozen IoM tensors are missing: {TENSOR_DIR}. The proposed arm "
-        f"cannot reproduce the sealed pipeline without them."
-    )
-available = sorted(p.name for p in TENSOR_DIR.glob("*.pt"))
-print("Preflight: PASS")
-print(f"Frozen IoM tensors on disk ({len(available)}):",
-      ", ".join(available) if available else "NONE - the run will fail")
-print("Hash reconstruction device:", DEVICE)
-print("This notebook writes exactly one file:", ABLATION_OUTPUT.name)
-print("It changes no seal and fits no threshold.")'''
-
-C2 = r'''#@title 2. Frozen-pipeline primitives (identical to the held-out notebook)
 def sha256_file(path, chunk=8 * 1024 * 1024):
     digest = hashlib.sha256()
     with open(path, "rb") as handle:
@@ -195,9 +131,9 @@ def load_iom_tensor(modality, overlap, d):
     return tensor
 
 
-print("Frozen-pipeline primitives ready.")'''
+print("Frozen-pipeline primitives ready.")
 
-C3 = r'''#@title 3. The three arms
+
 ARMS = ("polyiom", "iom_only", "randproj_iom")
 ARM_NOTE = {
     "polyiom": "z -> P_K*(z; o*) -> IoM-GRP   (the proposed method)",
@@ -349,9 +285,9 @@ def build_arm_histograms(modality):
     }
 
 
-print("Arm construction ready.")'''
+print("Arm construction ready.")
 
-C4 = r'''#@title 4. Metrics, self-check, and the paired identity bootstrap
+
 def eer_from_histograms(genuine, impostor):
     genuine_total, impostor_total = genuine.sum(), impostor.sum()
     if genuine_total <= 0 or impostor_total <= 0:
@@ -595,80 +531,4 @@ def contrast_report(result):
     print("  came from the dimension change and not from P_K*.")
 
 
-print("Metrics and paired bootstrap ready.")'''
-
-C5 = r'''#@title 5. Run the ablation
-ablation = run_ablation(n_bootstrap=2000, confidence=0.95)
-display(ablation_table(ablation))
-contrast_report(ablation)'''
-
-INTRO = """# AttackAware PolyIoM v1.1.4 — hardening ablation
-
-The 80-configuration sweep varies `M`, `q` and `o`. All three are IoM-GRP
-parameters (`o` is the hardening window overlap, which only sets the output
-length). **No condition in the study removes the polynomial**, so nothing in the
-reported results shows what `P_K*` contributes over IoM-GRP alone. This notebook
-adds that condition.
-
-Three arms, all at the **already sealed** `M*`, `q*`, `o*`:
-
-| arm | pipeline | question it answers |
-|---|---|---|
-| `polyiom` | `z -> P_K*(z; o*) -> IoM-GRP` | the proposed method |
-| `iom_only` | `z -> IoM-GRP` | versus the practical baseline |
-| `randproj_iom` | `z -> A z -> IoM-GRP` | **isolates the polynomial** |
-
-The third arm is the one that makes this a real ablation. Hardening also reduces
-dimensionality — `k = 1 + ceil((d - G) / (G - o))`, so face goes 512 → 128 and
-voice 192 → 48. Comparing `polyiom` against `iom_only` alone would confound *the
-polynomial helps* with *a lower projection dimension helps*. Arm 3 applies a
-fixed random linear map to the same `k`, so `polyiom` vs `randproj_iom` isolates
-`P_K*` itself.
-
-**Protocol discipline.** No selection, no re-tuning, no threshold is fitted, and
-no seal is written. `EER` and `Dsys` are threshold-free, so no threshold is
-carried between arms; `TAR` is reported at matched FMR and is labelled
-descriptive. Intervals use the study's identity-cluster bootstrap, **paired**:
-one identity weight vector per replicate is applied to all three arms, so an
-interval on a difference accounts for the arms sharing identities.
-
-**Self-check.** The `polyiom` arm rebuilds the sealed pipeline exactly — same
-frozen key, same frozen IoM tensor, same unlinkability seeds — so its EER must
-reproduce the sealed held-out figure. If it does not, the notebook raises rather
-than printing numbers.
-
-It reads the stored embeddings, keys and sealed results, and writes exactly one
-new file: `runs/ablation/ablation_result.json`.
-"""
-
-
-def code(cell_id, source):
-    return {
-        "cell_type": "code", "execution_count": None,
-        "id": cell_id, "metadata": {"id": cell_id},
-        "outputs": [], "source": source.splitlines(keepends=True),
-    }
-
-
-notebook = {
-    "cells": [
-        {"cell_type": "markdown", "id": "intro", "metadata": {"id": "intro"},
-         "source": INTRO.splitlines(keepends=True)},
-        code("preflight", C1),
-        code("primitives", C2),
-        code("arms", C3),
-        code("bootstrap", C4),
-        code("run", C5),
-    ],
-    "metadata": {
-        "colab": {"provenance": []},
-        "kernelspec": {"display_name": "Python 3", "language": "python",
-                       "name": "python3"},
-        "language_info": {"name": "python", "version": "3"},
-    },
-    "nbformat": 4, "nbformat_minor": 5,
-}
-
-out = Path(__file__).parent / "AttackAware_PolyIoM_v1_1_4_ABLATION.ipynb"
-out.write_text(json.dumps(notebook, indent=1))
-print("wrote", out, out.stat().st_size, "bytes")
+print("Metrics and paired bootstrap ready.")
