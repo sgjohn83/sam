@@ -35,21 +35,56 @@ def poly_transform_diff(vectors, coefficients, exponents, overlap):
     return (powers * coefficients).sum(dim=-1)
 
 
-def assert_diff_matches(modality, key, overlap, d):
-    """Assertion 1 - the differentiable path is the study's path."""
+def assert_diff_matches(modality, key, overlap, d, tolerance=1e-4):
+    """Assertion 1 - the differentiable path is the study's path.
+
+    Checked on RELATIVE error, and on the bucket indices it produces, not
+    on absolute error. torch.pow(x, int64_tensor) and x ** int dispatch to
+    different kernels, so they round differently; on a polynomial whose
+    intermediate values can be large that shows as an absolute gap of a few
+    1e-4 while the relative gap is ~1e-7. An earlier absolute threshold of
+    1e-4 here was simply the wrong test.
+
+    What actually matters is that no bucket index moves. This function
+    checks that directly on the probes, and assertion 2 then confirms it
+    end to end against the real stored templates.
+    """
     generator = torch.Generator(device="cpu")
     generator.manual_seed(H(S0, "INVERSION-CHECK", modality))
-    probe = torch.randn((8, d), generator=generator, dtype=torch.float32)
+    probe = torch.randn((64, d), generator=generator, dtype=torch.float32)
+    probe = probe / probe.norm(dim=-1, keepdim=True)   # as real embeddings are
     reference = poly_transform(probe, key[0], key[1], overlap)
     candidate = poly_transform_diff(probe, key[0], key[1], overlap)
-    gap = float((reference - candidate).abs().max())
-    if not gap < 1e-4:
+
+    absolute = float((reference - candidate).abs().max())
+    scale = float(reference.abs().max())
+    relative = absolute / max(scale, 1e-30)
+    if not relative < tolerance:
         raise RuntimeError(
-            f"{modality}: differentiable polynomial differs from the study's "
-            f"by {gap:.3e}; the attack would not be attacking the real scheme."
+            f"{modality}: differentiable polynomial differs from the "
+            f"study's by a relative {relative:.3e} (absolute {absolute:.3e} "
+            f"at scale {scale:.3e}); the attack would not be attacking the "
+            f"real scheme."
+        )
+
+    # The decisive check: same argmax, on a tensor of the right width.
+    k = 1 + math.ceil((d - G) / (G - overlap))
+    probe_generator = torch.Generator(device="cpu")
+    probe_generator.manual_seed(H(S0, "INVERSION-CHECK-TENSOR", modality))
+    probe_tensor = torch.randn((64, 32, k), generator=probe_generator,
+                               dtype=torch.float32)
+    left = torch.argmax(torch.einsum("bk,mqk->bmq", reference, probe_tensor), -1)
+    right = torch.argmax(torch.einsum("bk,mqk->bmq", candidate, probe_tensor), -1)
+    moved = int((left != right).sum())
+    if moved:
+        raise RuntimeError(
+            f"{modality}: {moved} bucket indices move between the study's "
+            f"polynomial and the differentiable one; the attack would not "
+            f"be attacking the real scheme."
         )
     print(f"    assertion 1 OK: differentiable polynomial matches "
-          f"(max |diff| {gap:.2e})")
+          f"(relative {relative:.2e}, absolute {absolute:.2e} at scale "
+          f"{scale:.2e}) and moves no bucket index")
 
 
 def project(arm, z, key, overlap, A):
