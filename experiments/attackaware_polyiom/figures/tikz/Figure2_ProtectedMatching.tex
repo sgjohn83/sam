@@ -55,12 +55,13 @@
  \ifnum\hit=1\draw[cgreen,line width=1.1pt](2.81+.58*\i,6.89)--(2.81+.58*\i,5.87);\fi}
 
 % ---------------- the count ----------------
-\draw[grn] (6.62,6.38)--(7.42,6.38);
+\draw[grn] (6.72,6.38)--(7.92,6.38);
+\node[lab,text=cgreen,fill=white,inner sep=1.2pt] at (7.32,6.68) {count};
 \path[fill=cgreenf,draw=cgreen,line width=1.3pt,rounded corners=1.2mm]
- (7.56,5.83) rectangle (8.76,6.93);
+ (8.06,5.83) rectangle (9.26,6.93);
 \node[font=\sffamily\bfseries\fontsize{17}{18}\selectfont,text=cgreen]
- at (8.16,6.38) {5};
-\node[lab,text=cgreen] at (8.16,5.55) {matches};
+ at (8.66,6.38) {5};
+\node[lab,text=cgreen] at (8.66,5.55) {matches};
 
 % ---------------- the frozen threshold, as a scale ----------------
 \path[fill=credf,draw=none]   (11.00,6.10) rectangle (14.20,6.62);
@@ -83,7 +84,8 @@
  at (15.40,7.24) {ACCEPT};
 
 % the score lands on the scale
-\draw[grn] (8.16,5.81)--(8.16,5.18)--(15.00,5.18)--(15.00,6.22);
+\draw[grn] (8.66,5.81)--(8.66,5.18)--(15.00,5.18)--(15.00,6.22);
+\node[lab] at (12.20,5.50) {matching positions};
 \fill[cgreen] (15.00,6.36) circle (.14);
 
 \end{tikzpicture}
