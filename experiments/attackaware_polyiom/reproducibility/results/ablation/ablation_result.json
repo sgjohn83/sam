@@ -1,0 +1,179 @@
+{
+  "analysis": "hardening_ablation",
+  "arms": {
+    "iom_only": "z ----------------> IoM-GRP   (the practical baseline)",
+    "polyiom": "z -> P_K*(z; o*) -> IoM-GRP   (the proposed method)",
+    "randproj_iom": "z -> A z ----------> IoM-GRP   (isolates the polynomial)"
+  },
+  "changes_any_seal": false,
+  "confidence": 0.95,
+  "master_seed": 2026,
+  "method_id": "identity_cluster_percentile_v1_paired",
+  "modalities": {
+    "face": {
+      "M": 256,
+      "arms": {
+        "iom_only": {
+          "Dsys": 0.11696539072288004,
+          "Dsys_CI": [
+            0.10122273256555415,
+            0.2575621193668769
+          ],
+          "EER": 0.04247104247104247,
+          "EER_CI": [
+            0.013369041102825092,
+            0.08592738876244022
+          ],
+          "TAR_at_matched_FMR_descriptive": 0.8764478764478765
+        },
+        "polyiom": {
+          "Dsys": 0.15080275075742733,
+          "Dsys_CI": [
+            0.12497592639109305,
+            0.28061138210717557
+          ],
+          "EER": 0.04799467957362694,
+          "EER_CI": [
+            0.017368262392620758,
+            0.09737455861197072
+          ],
+          "TAR_at_matched_FMR_descriptive": 0.8223938223938224
+        },
+        "randproj_iom": {
+          "Dsys": 0.09614022644879111,
+          "Dsys_CI": [
+            0.09229079332453327,
+            0.2327258253452317
+          ],
+          "EER": 0.03861003861003861,
+          "EER_CI": [
+            0.01689047001547002,
+            0.08375024630541868
+          ],
+          "TAR_at_matched_FMR_descriptive": 0.8841698841698842
+        }
+      },
+      "c_tau_carried_from_DEV": 68,
+      "contrasts_vs_polyiom": {
+        "iom_only": {
+          "delta_Dsys": -0.03383736003454729,
+          "delta_Dsys_CI": [
+            -0.1318095991898863,
+            0.09417188135517908
+          ],
+          "delta_EER": -0.0055236371025844735,
+          "delta_EER_CI": [
+            -0.021176719840478565,
+            0.00416097968719376
+          ]
+        },
+        "randproj_iom": {
+          "delta_Dsys": -0.05466252430863622,
+          "delta_Dsys_CI": [
+            -0.13927409682400674,
+            0.06969930050428631
+          ],
+          "delta_EER": -0.009384640963588334,
+          "delta_EER_CI": [
+            -0.025751072961373397,
+            0.004537195270363405
+          ]
+        }
+      },
+      "d": 512,
+      "frozen_tensor_is_gaussian": true,
+      "k": 128,
+      "n_subjects": 58,
+      "o": 1,
+      "polyiom_reproduces_sealed_heldout": true,
+      "q": 32,
+      "reference_FMR_for_matched_TAR": 0.000406421459053038
+    },
+    "voice": {
+      "M": 128,
+      "arms": {
+        "iom_only": {
+          "Dsys": 0.07282230188335274,
+          "Dsys_CI": [
+            0.05808619133849283,
+            0.19156131357397968
+          ],
+          "EER": 0.0027298850574712643,
+          "EER_CI": [
+            0.00034276508115965455,
+            0.00567936822790284
+          ],
+          "TAR_at_matched_FMR_descriptive": 0.996551724137931
+        },
+        "polyiom": {
+          "Dsys": 0.08843067398431459,
+          "Dsys_CI": [
+            0.06940323384881929,
+            0.22061115253113128
+          ],
+          "EER": 0.0192823016202742,
+          "EER_CI": [
+            0.011097485553269934,
+            0.02950966879593137
+          ],
+          "TAR_at_matched_FMR_descriptive": 0.9396551724137931
+        },
+        "randproj_iom": {
+          "Dsys": 0.11316196400960966,
+          "Dsys_CI": [
+            0.08321051702917112,
+            0.22090514142909964
+          ],
+          "EER": 0.007002419842710224,
+          "EER_CI": [
+            0.0030539788016163347,
+            0.013793103448275862
+          ],
+          "TAR_at_matched_FMR_descriptive": 0.9896551724137931
+        }
+      },
+      "c_tau_carried_from_DEV": 37,
+      "contrasts_vs_polyiom": {
+        "iom_only": {
+          "delta_Dsys": -0.015608372100961845,
+          "delta_Dsys_CI": [
+            -0.12474995222638989,
+            0.08654315783644746
+          ],
+          "delta_EER": -0.016552416562802933,
+          "delta_EER_CI": [
+            -0.025631959284318967,
+            -0.009031486540190231
+          ]
+        },
+        "randproj_iom": {
+          "delta_Dsys": 0.024731290025295075,
+          "delta_Dsys_CI": [
+            -0.09236389690750378,
+            0.10568412545913647
+          ],
+          "delta_EER": -0.012279881777563974,
+          "delta_EER_CI": [
+            -0.02187452937884844,
+            -0.0028518109672935545
+          ]
+        }
+      },
+      "d": 192,
+      "frozen_tensor_is_gaussian": true,
+      "k": 48,
+      "n_subjects": 58,
+      "o": 1,
+      "polyiom_reproduces_sealed_heldout": true,
+      "q": 32,
+      "reference_FMR_for_matched_TAR": 0.0018451300665456745
+    }
+  },
+  "n_bootstrap": 2000,
+  "schema": 1,
+  "source_heldout_sha256": {
+    "face": "90b00186c204fc9f112a4d111717a22181ca0cefea027fdaf32db03782a88108",
+    "voice": "33dc476b920dabf5b9ee47951cb806b69fde87ee790875d7b95cca699e99ee15"
+  },
+  "threshold_policy": "none fitted; EER and Dsys are threshold-free"
+}

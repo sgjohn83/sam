@@ -17,13 +17,13 @@ axis and was an artifact of three draws.
 
 ## What the 40 keys show
 
-| voice, n=58, τ=37 | PRAR | 95% CI | per-key med / min / max | keys failing outright |
+| voice, n=58, τ=37 | PRAR | 95% CI | per-key med / min / max | keys failing for >=50% |
 |---|---|---|---|---|
 | `polyiom` | 7.50% | [2.11, 14.44] | 0.00 / 0.00 / **89.66** | **2 of 40** |
 | `iom_only` | 100.00% | [100, 100] | 100 / 100 / 100 | 40 of 40 |
 | `randproj_iom` | 5.73% | [4.01, 7.63] | 6.90 / 0.00 / 13.79 | **0 of 40** |
 
-| face, n=58, τ=68 | PRAR | 95% CI | per-key med / min / max | keys failing outright |
+| face, n=58, τ=68 | PRAR | 95% CI | per-key med / min / max | keys failing for >=50% |
 |---|---|---|---|---|
 | `polyiom` | 25.60% | [13.02, 38.58] | 0.00 / 0.00 / **100.00** | **10 of 40** |
 | `iom_only` | 100.00% | [100, 100] | 100 / 100 / 100 | 40 of 40 |
@@ -61,7 +61,7 @@ every time, because the failure is unpredictable and total.
 | SAR (inversion) | 100% | 100% | identical |
 | PRAR, voice | 5.73% | 7.50% | not distinguishable |
 | PRAR, face | 2.89% | 25.60% | randproj better, FIRM |
-| keys failing outright | 0 of 80 | 12 of 80 | randproj never fails |
+| keys failing for >=50% of subjects | 0 of 80 | 12 of 80 | randproj never fails |
 
 Both are keyed compressions; one is linear, the other polynomial. On this
 evidence the linear map is better on accuracy, no worse on revocation

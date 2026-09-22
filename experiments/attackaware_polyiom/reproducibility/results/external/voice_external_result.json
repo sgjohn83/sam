@@ -1,0 +1,29 @@
+{
+  "Dsys_EXT": 0.08030046844714253,
+  "EER_EXT": 0.027977167019027485,
+  "FMR_EXT_at_dev_threshold": 0.003769808173477898,
+  "FNMR_EXT_at_dev_threshold": 0.10999999999999999,
+  "M": 128,
+  "TAR_EXT_at_dev_threshold": 0.89,
+  "c_EER_EXT": 28,
+  "c_tau_carried_from_DEV": 37,
+  "corpus": "VCTK-Corpus-0.92",
+  "development_reference": {
+    "Dsys_DEV": 0.0525185719007491,
+    "EER": 0.0095238095238095,
+    "TAR_DEV": 0.9523809523809524,
+    "c_tau_DEV": 37
+  },
+  "modality": "voice",
+  "n_genuine": 1100,
+  "n_impostor": 119900,
+  "n_subjects": 110,
+  "o": 1,
+  "operating_point_sha256": "027e18fa7fa5de062c4a3a538b1a2a36391f1626bbb72e577ee510c94bffab58",
+  "protocol": "1.1.1",
+  "q": 32,
+  "selection_rule_id": "min_dsys_subject_to_eer_floor_v1",
+  "vctk_embeddings_sha256": "5fd9c3b6e71282bbbe890e2c7dfb01b4de00c7e4acac5ec156995709e495007a",
+  "vctk_manifest_sha256": "3025b1d448e318ccde93c3becab392c15f075b128c260bcd3dbc4c61742a9705",
+  "voice_key_sha256": "e5b716fa56c5f7c800b1efb3fdfdda4be36ff8f3d1ba95329de4dfc359337678"
+}

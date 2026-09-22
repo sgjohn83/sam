@@ -64,7 +64,8 @@ compression of the embedding before hashing removes this failure. The
 polynomial is not the best available compression: a keyed random linear
 projection of the same output size is 1.23 points more accurate on voice,
 revokes at least as reliably, and never failed outright, whereas the
-polynomial failed completely for 12 of 80 fresh key sets.
+polynomial left at least half the subjects' old templates working for 12
+of 80 fresh key sets, and every subject's for 8 of them.
 
 We conclude that keyed compression before IoM hashing is necessary for
 revocability and that a keyed random linear projection is sufficient for
@@ -202,7 +203,7 @@ What it costs, and what the polynomial specifically contributes:
 | Does the polynomial beat a linear map on accuracy? | No. It costs 1.23 pp EER on voice (firm). |
 | Does it improve unlinkability? | No contrast is distinguishable. |
 | Does it prevent acceptance by an inverted template? | No. Every arm was inverted to acceptance at a 100% success rate. |
-| Is it the right compression for revocability? | No. A linear map revokes at least as reliably and never failed outright; the polynomial failed completely for 12 of 80 key sets. |
+| Is it the right compression for revocability? | No. A linear map revokes at least as reliably and never failed for as many as half the subjects under any key; the polynomial did so for 12 of 80 key sets, and failed for every subject under 8 of them. |
 
 ---
 
@@ -785,13 +786,13 @@ from the rest.
 
 #### 5.6.2 Result
 
-| Voice | PRAR | Per-key median / maximum | Keys failing outright |
+| Voice | PRAR | Per-key median / maximum | Keys failing for >=50% of subjects |
 |---|---|---|---|
 | PolyIoM | 7.50% [2.11, 14.44] | 0.00% / 89.66% | 2 of 40 |
 | `iom_only` | **100.00%** [100, 100] | 100% / 100% | **40 of 40** |
 | `randproj_iom` | 5.73% [4.01, 7.63] | 6.90% / 13.79% | **0 of 40** |
 
-| Face | PRAR | Per-key median / maximum | Keys failing outright |
+| Face | PRAR | Per-key median / maximum | Keys failing for >=50% of subjects |
 |---|---|---|---|
 | PolyIoM | 25.60% [13.02, 38.58] | 0.00% / 100.00% | 10 of 40 |
 | `iom_only` | **100.00%** [100, 100] | 100% / 100% | **40 of 40** |
@@ -862,7 +863,7 @@ projection of the same output size:
 | Unlinkability | No contrast distinguishable. |
 | Preventing acceptance by an inverted template | Neither arm prevents it. 100% attack success for both. |
 | Concealing the embedding | The polynomial helps: cosine 0.222 against 0.913 (firm). |
-| Revocability | Both work; the linear map never failed outright, the polynomial failed completely for 12 of 80 key sets. |
+| Revocability | Both work in the median case; the linear map never left half the subjects exposed under any key, the polynomial did for 12 of 80 key sets and left every subject exposed under 8. |
 
 Taken together: the sealed scheme meets recognition and unlinkability on
 unseen and external speakers, and conceals the underlying biometric from a
@@ -1052,7 +1053,8 @@ revocable at all: a stolen template remained a valid credential after
 re-keying in every one of eighty trials. With it, revocation works. A
 random linear projection fills that role more accurately, at least as
 reliably, and without the polynomial's catastrophic failure mode, in which
-12 of 80 key sets failed to revoke at all.
+12 of 80 key sets left at least half the subjects' old templates
+still working, and 8 of those left every subject's working.
 
 The broader lesson concerns evaluation rather than design. Three of the
 four standard requirements for a cancelable scheme can be measured on a

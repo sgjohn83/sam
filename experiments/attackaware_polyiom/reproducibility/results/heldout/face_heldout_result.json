@@ -1,0 +1,25 @@
+{
+  "Dsys_HOLDOUT": 0.15080275075742733,
+  "EER_HOLDOUT": 0.04799467957362694,
+  "FMR_HOLDOUT_at_dev_threshold": 0.000406421459053038,
+  "FNMR_HOLDOUT_at_dev_threshold": 0.17760617760617758,
+  "M": 256,
+  "TAR_HOLDOUT_at_dev_threshold": 0.8223938223938224,
+  "c_EER_HOLDOUT": 31,
+  "c_tau_carried_from_DEV": 68,
+  "development_reference": {
+    "Dsys_DEV": 0.1331002909486603,
+    "EER": 0.0283906723831433,
+    "TAR_DEV": 0.8625954198473282,
+    "c_tau_DEV": 68
+  },
+  "modality": "face",
+  "n_genuine": 259,
+  "n_impostor": 14763,
+  "n_subjects": 58,
+  "o": 1,
+  "partition": "evaluation",
+  "protocol": "1.1.1",
+  "q": 32,
+  "selection_rule_id": "min_dsys_subject_to_eer_floor_v1_face_eer0.03_tar0.85"
+}

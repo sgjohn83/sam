@@ -172,13 +172,13 @@ template, is presented. The attacker does not re-attack.
 We report **PRAR**, the post-revocation acceptance rate, over 40 fresh key
 sets, with intervals resampling keys as well as identities.
 
-| voice | PRAR | per-key median / max | keys failing outright |
+| voice | PRAR | per-key median / max | keys failing for >=50% of subjects |
 |---|---|---|---|
 | PolyIoM | 7.50% [2.11, 14.44] | 0.00% / 89.66% | 2 of 40 |
 | `iom_only` | **100.00%** [100, 100] | 100% / 100% | **40 of 40** |
 | `randproj_iom` | 5.73% [4.01, 7.63] | 6.90% / 13.79% | **0 of 40** |
 
-| face | PRAR | per-key median / max | keys failing outright |
+| face | PRAR | per-key median / max | keys failing for >=50% of subjects |
 |---|---|---|---|
 | PolyIoM | 25.60% [13.02, 38.58] | 0.00% / 100.00% | 10 of 40 |
 | `iom_only` | **100.00%** [100, 100] | 100% / 100% | **40 of 40** |

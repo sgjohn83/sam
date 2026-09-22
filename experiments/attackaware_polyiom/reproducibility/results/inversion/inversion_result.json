@@ -1,0 +1,157 @@
+{
+  "adversary": "level 3: holds K*, R, the algorithm and the template",
+  "analysis": "full_knowledge_inversion",
+  "attack": "annealed-softmax gradient descent on the unit sphere, identical budget for every arm",
+  "budget": {
+    "lr": 0.05,
+    "restarts": 5,
+    "steps": 800,
+    "temperature": [
+      1.0,
+      0.05
+    ]
+  },
+  "changes_any_seal": false,
+  "confidence": 0.95,
+  "master_seed": 2026,
+  "measures": "practical inversion resistance under this budget; NOT information-theoretic irreversibility",
+  "method_id": "identity_cluster_percentile_v1_paired",
+  "modalities": {
+    "face": {
+      "M": 256,
+      "arms": {
+        "iom_only": {
+          "SAR": 1.0,
+          "SAR_CI": [
+            0.9999999999999999,
+            1.0000000000000002
+          ],
+          "chance_collisions": 8.0,
+          "cos_chance": 0.028728477656841278,
+          "cos_to_true": 0.8758925795555115,
+          "cross_key_collisions": 129.93103448275863,
+          "cross_key_impostor_mean": 10.34543228149414,
+          "mean_collisions": 256.0,
+          "random_guess_collisions": 8.431034482758621
+        },
+        "polyiom": {
+          "SAR": 1.0,
+          "SAR_CI": [
+            0.9999999999999999,
+            1.0000000000000002
+          ],
+          "chance_collisions": 8.0,
+          "cos_chance": 0.028728477656841278,
+          "cos_to_true": 0.41843363642692566,
+          "cross_key_collisions": 208.01724137931035,
+          "cross_key_impostor_mean": 12.934059143066406,
+          "mean_collisions": 256.0,
+          "random_guess_collisions": 11.10344827586207
+        },
+        "randproj_iom": {
+          "SAR": 1.0,
+          "SAR_CI": [
+            0.9999999999999999,
+            1.0000000000000002
+          ],
+          "chance_collisions": 8.0,
+          "cos_chance": 0.028728477656841278,
+          "cos_to_true": 0.49227818846702576,
+          "cross_key_collisions": 198.20689655172413,
+          "cross_key_impostor_mean": 10.888082504272461,
+          "mean_collisions": 238.82758620689654,
+          "random_guess_collisions": 8.517241379310345
+        }
+      },
+      "contrasts_vs_polyiom": {
+        "iom_only": {
+          "delta_SAR": 0.0,
+          "delta_SAR_CI": [
+            0.0,
+            0.0
+          ]
+        },
+        "randproj_iom": {
+          "delta_SAR": 0.0,
+          "delta_SAR_CI": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "d": 512,
+      "k": 128,
+      "n_subjects": 58,
+      "tau": 68
+    },
+    "voice": {
+      "M": 128,
+      "arms": {
+        "iom_only": {
+          "SAR": 1.0,
+          "SAR_CI": [
+            0.9999999999999999,
+            1.0000000000000002
+          ],
+          "chance_collisions": 4.0,
+          "cos_chance": 0.12024644017219543,
+          "cos_to_true": 0.9128499031066895,
+          "cross_key_collisions": 73.8103448275862,
+          "cross_key_impostor_mean": 7.222020626068115,
+          "mean_collisions": 128.0,
+          "random_guess_collisions": 3.810344827586207
+        },
+        "polyiom": {
+          "SAR": 1.0,
+          "SAR_CI": [
+            0.9999999999999999,
+            1.0000000000000002
+          ],
+          "chance_collisions": 4.0,
+          "cos_chance": 0.12024644017219543,
+          "cos_to_true": 0.22194789350032806,
+          "cross_key_collisions": 109.41379310344827,
+          "cross_key_impostor_mean": 10.227465629577637,
+          "mean_collisions": 128.0,
+          "random_guess_collisions": 9.258620689655173
+        },
+        "randproj_iom": {
+          "SAR": 1.0,
+          "SAR_CI": [
+            0.9999999999999999,
+            1.0000000000000002
+          ],
+          "chance_collisions": 4.0,
+          "cos_chance": 0.12024644017219543,
+          "cos_to_true": 0.4896182715892792,
+          "cross_key_collisions": 107.13793103448276,
+          "cross_key_impostor_mean": 7.620084762573242,
+          "mean_collisions": 125.72413793103448,
+          "random_guess_collisions": 4.172413793103448
+        }
+      },
+      "contrasts_vs_polyiom": {
+        "iom_only": {
+          "delta_SAR": 0.0,
+          "delta_SAR_CI": [
+            0.0,
+            0.0
+          ]
+        },
+        "randproj_iom": {
+          "delta_SAR": 0.0,
+          "delta_SAR_CI": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "d": 192,
+      "k": 48,
+      "n_subjects": 58,
+      "tau": 37
+    }
+  },
+  "n_bootstrap": 2000,
+  "schema": 1
+}
