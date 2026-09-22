@@ -9,14 +9,76 @@ matches the artifact.
 
 ---
 
+## Quick start
+
+```
+unzip AttackAware_PolyIoM_v1_1_4_reproducibility.zip
+cd reproducibility
+python3 run.py verify      # the paper's numbers. Python only, ~1 second
+python3 run.py demo        # the pipeline on synthetic data. needs numpy
+python3 run.py parity      # NumPy vs the study's PyTorch. needs torch
+python3 run.py all         # all three
+```
+
+`run.py --help` lists them. Every command exits non-zero on failure, so
+they drop straight into CI.
+
+The three answer different questions:
+
+| Command | Question | Needs |
+|---|---|---|
+| `verify` | does the manuscript match the stored results? | Python 3.8 |
+| `demo` | does the pipeline code actually run? | numpy |
+| `parity` | is the NumPy pipeline the same maths as the study's? | torch |
+
+### `demo` — running the pipeline without the data
+
+The real embeddings are not ours to redistribute, so `demo` generates
+stand-in identities of the same shape as the voice data and runs all three
+arms through hardening, hashing, matching, and the metrics.
+
+**Its numbers are not the paper's.** They come from Gaussian clusters, not
+from people. It exists so the code can be executed and read, not as
+evidence. It covers recognition and unlinkability; it does not cover
+revocability, because that result rests on the inversion attack and on the
+fact that the attack recovers the true embedding from an `iom_only`
+template (cosine 0.913) but not from a `polyiom` one (0.222). Comparing
+templates across keys, which is all the demo does cheaply, does not show
+that.
+
+### `parity` — is the NumPy rewrite faithful?
+
+`polyiom/core.py` is a NumPy rewrite of a pipeline the study ran on
+PyTorch, so it is only worth trusting if the two agree. `parity` runs both
+on the same inputs and compares:
+
+```
+hardened vector, max absolute difference  2.980e-08
+as a fraction of the data's scale         1.429e-07  (1.2 x float32 eps)
+template indices differing                0 of 32768
+PARITY OK
+```
+
+One float32 ulp on the hardened vector, and **zero** template indices
+differing. The index check is the one that decides: a template is a set of
+argmax indices, and every downstream number is built from comparing them,
+so a single differing index would mean a different pipeline.
+
+Note the error is measured against the scale of the data, not per element.
+A per-element relative error is meaningless where a hardened value happens
+to sit near zero, and reports a large number for a difference of one bit.
+
+Without torch installed, `parity` prints that it is **skipped** and says
+the NumPy pipeline is unverified. It does not claim to pass.
+
+---
+
 ## Level 1 — verify the paper's numbers (offline, ~1 second)
 
 Requires Python 3.8 or newer. No packages, no data, no network, no GPU.
 
 ```
-unzip AttackAware_PolyIoM_v1_1_4_reproducibility.zip
-cd reproducibility
-python3 verify.py
+python3 run.py verify        # or: python3 verify.py
 ```
 
 ### Expected output

@@ -1,0 +1,8 @@
+numpy>=1.20
+
+# optional, only for `run.py parity`
+# torch
+
+# optional, only for rebuilding the figures
+# matplotlib
+# scipy

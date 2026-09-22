@@ -4,13 +4,31 @@ Everything needed to check the paper's numbers, and to rerun the analyses
 that produced them.
 
 ```
+run.py               one entry point: verify | demo | parity | all
 verify.py            recomputes every number the paper reports, from results/
+polyiom/             the pipeline as plain NumPy, runnable anywhere
+  core.py            hardening, hashing, matching
+  metrics.py         EER, D_link, D_sys, TAR, FMR, PRAR
+  demo.py            end to end on synthetic data
+  parity.py          checks core.py against the study's PyTorch code
 results/             the stored outputs of each analysis
-code/runtime/        the analysis code (*_only.py)
+code/runtime/        the analysis code as the study ran it (*_only.py)
 code/notebooks/      the Colab notebooks that load and run it
 code/figures/        figure builders and the figure explanation text
+requirements.txt     numpy; torch and matplotlib are optional
 MANIFEST.sha256      hashes of every file here
 ```
+
+## Quickest possible start
+
+```
+python3 run.py verify     # no dependencies at all
+python3 run.py all        # add numpy, and torch if you have it
+```
+
+`code/` is the study as it ran, in Colab against Google Drive. `polyiom/`
+is the same pipeline as ordinary Python that runs anywhere, checked
+against the original by `run.py parity`.
 
 ## 1. Check the numbers without running anything
 
