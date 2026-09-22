@@ -1125,6 +1125,53 @@ the results we do claim without them.
 
 ---
 
+## Declarations
+
+*To be adapted to the target venue's required headings. Bracketed items
+are for the authors to fill.*
+
+**Declaration of generative AI use.** The authors used a generative AI
+assistant, [TOOL NAME AND VERSION], in the preparation of this work. Its
+use extended beyond language editing. It assisted in writing the analysis
+code for the ablation, inversion, revocation and score-distribution
+analyses (Sections 5.4 to 5.6 and the results figures), in producing the
+figures, in building the reproducibility package, and in drafting and
+revising the manuscript text. The study design, the pre-registered
+protocol, the identity partitions, the key search, the sealed operating
+points and the confirmatory results of Sections 5.1 to 5.3 were produced
+by the authors before and independently of that assistance. The authors
+reviewed all generated code and text, re-ran the analyses, and take full
+responsibility for the content. Every numerical claim in this paper can be
+re-derived from the stored results by the verification script in the
+accompanying package, independently of the tool that helped produce it.
+
+**Author contributions.** [CRediT roles: conceptualisation, methodology,
+software, validation, formal analysis, investigation, data curation,
+writing (original draft), writing (review and editing), visualisation,
+supervision.]
+
+**Third-party components.** Face and speaker embeddings were produced with
+publicly released encoders `[CITE: face encoder]`, `[CITE: speaker
+encoder]`, used unmodified. Corpora: Labeled Faces in the Wild,
+LibriSpeech and VCTK, under their distributors' terms (see the package's
+DATA.md). No component was trained, fine-tuned or modified by the authors.
+
+**Data and code availability.** As stated in the accompanying package
+(DATA.md). Aggregate results sufficient to reproduce every table and
+figure are included; derived embeddings are not redistributed because an
+embedding is a derived representation of a biometric sample rather than
+an anonymisation of it, as the inversion analysis in this paper shows.
+
+**Ethics.** No new human-subject data was collected. The inversion
+analysis attacks templates the authors generated from public corpora; no
+deployed system was attacked and no third party's template was used.
+
+**Competing interests.** [None declared / to be stated.]
+
+**Funding.** [To be stated.]
+
+---
+
 ## 9. What a literature pass must supply
 
 No reference in this draft has been invented. The following claims need
