@@ -1,0 +1,138 @@
+{
+ "title": "AttackAware PolyIoM v1.1.4 \u2014 Results Figures",
+ "subtitle": "Four figures, one per ISO/IEC 24745 criterion, with explanation",
+ "note": "Every number in this document is from the sealed run. The figures are built from stored score histograms, and the equal error rates recomputed from those histograms reproduce the sealed held-out figures exactly, so no figure here can disagree with the sealed results.",
+ "intro_h": "What these four figures are for",
+ "intro": [
+  "A cancelable biometric scheme has to satisfy four requirements at once. It must still recognise people, it must not give the original biometric back, templates held in two different databases must not be linkable to one person, and a stolen template must stop working once the subject re-enrols under a new key. Each of the four figures below answers one of those questions.",
+  "All four are drawn from one file, produced by a read-only pass over the sealed pipeline. A collision score is a whole number between 0 and M, so a count of how often each score occurs is a complete record of the distribution: nothing is approximated, and every rate, curve and threshold in these figures is derived from that record exactly. The unprotected baseline is plain cosine matching on the identical enrolment and probe sets, binned finely over [-1, 1].",
+  "Colour means one thing throughout. Blue is genuine comparisons, or the protected system. Grey is impostor comparisons, or non-mated pairs. Green is pseudo-impostor comparisons, meaning a template whose key has been revoked. Orange is the unprotected baseline and nothing else."
+ ],
+ "op_h": "The sealed operating point",
+ "op_intro": "Both configurations and both thresholds were chosen on 42 development identities and then sealed. The 58 evaluation identities and the 110 external speakers were read only afterwards, and every figure below uses the sealed values without refitting.",
+ "op_table": [
+  [
+   "",
+   "M",
+   "q",
+   "o",
+   "tau*",
+   "Held-out EER",
+   "TAR at tau*",
+   "D_sys"
+  ],
+  [
+   "Voice",
+   "128",
+   "32",
+   "1",
+   "37",
+   "1.928% [1.092, 2.919]",
+   "93.966% [89.655, 97.414]",
+   "0.0884"
+  ],
+  [
+   "Face",
+   "256",
+   "32",
+   "1",
+   "68",
+   "4.799% [1.945, 10.345]",
+   "82.239% [72.767, 89.933]",
+   "0.1508"
+  ]
+ ],
+ "op_after": "D_sys is the global linkability measure. It runs from 0, fully unlinkable, to 1, fully linkable. Voice at 0.088 is strong, and it tightens to 0.080 on the external corpus.",
+ "figures": [
+  {
+   "file": "figA_det_preservation.png",
+   "label": "Figure A",
+   "title": "Performance preservation: what protection costs",
+   "caption": "Figure A. Left: detection error trade-off curves for the protected system on held-out voice, external voice and held-out face, with the equal-error point marked on each. Right: equal error rate for the protected system against the unprotected cosine baseline, at every split. Protected points carry the identity-cluster bootstrap interval. The unprotected baseline is drawn as a measured point where the split can resolve it, and as a one-sided 95% upper bound where it cannot. Each row is labelled firm, not resolvable, or no interval.",
+   "read_h": "How to read it",
+   "read": [
+    "The left panel is the standard way to show a verification system: lower and further left is better, and the marked point is where the two error types are equal. Voice held-out sits at 1.93%, voice external at 2.80%, face at 4.80%.",
+    "The right panel answers a different question \u2014 not how good the protected system is, but how much worse it is than not protecting at all. Read each row as a pair: the blue point and bar is the protected system, the orange marker below it is the unprotected baseline."
+   ],
+   "says_h": "What it says",
+   "says": [
+    "On voice, protection costs 1.84 percentage points of equal error rate on held-out speakers and 2.79 points on the external corpus. Both are firm: the lower end of the protected interval sits above the upper bound on the baseline, so the gap does not depend on where exactly the baseline falls.",
+    "On face, nothing is settled. The protected interval spans [1.945, 10.345] and the baseline's own upper bound, 5.504%, falls inside it. The 1.32 point difference cannot be distinguished from zero."
+   ],
+   "careful_h": "What not to conclude",
+   "careful": [
+    "The face row is not evidence that protection is free on face. It is evidence that 259 genuine comparisons cannot resolve an effect of this size. The two are different claims and only the second is supported.",
+    "No ratio should be quoted for voice. The unprotected voice system makes fewer than one genuine error on every split \u2014 one error is 0.172% on held-out and 0.091% on external \u2014 so the baseline point estimates fall below what the protocol can resolve. That is why the figure draws an arrow to a bound instead of a point, and why the apparent 22.7-fold and 848-fold ratios are artifacts of dividing by an unresolved number."
+   ]
+  },
+  {
+   "file": "figB_score_separability.png",
+   "label": "Figure B",
+   "title": "Separability: where the sealed threshold sits",
+   "caption": "Figure B. Genuine and impostor score distributions for the protected system on held-out identities, as a share of all comparisons, with the sealed threshold tau* marked. Voice: 580 genuine and 33,060 impostor comparisons over scores 0 to 128. Face: 259 genuine and 14,763 impostor comparisons over scores 0 to 256. Both axes are truncated to the occupied score range; the full range is stated in the axis label.",
+   "read_h": "How to read it",
+   "read": [
+    "A comparison is accepted when its collision score reaches the threshold. So everything to the right of the black line is accepted: grey mass there is a false match, and blue mass to the left of it is a false rejection.",
+    "The gap between the two humps is what recognition accuracy actually is. A wide clean gap means the threshold has room to move; overlap means it does not."
+   ],
+   "says_h": "What it says",
+   "says": [
+    "Voice separates cleanly, and the threshold of 37 sits in the gap rather than inside either distribution. That is why the sealed threshold survives being moved to identities it was not chosen on.",
+    "Face overlaps far more, and the threshold of 68 sits on the shoulder of the genuine distribution rather than clear of it. This is the visual form of the same weakness the intervals report: face is close to the limit of what this encoder and this trial count can support."
+   ],
+   "careful_h": "What not to conclude",
+   "careful": [
+    "The two panels have different horizontal scales because M differs, 128 against 256. The face distributions are not literally wider; they are drawn over twice as many score values. Compare the shape of the overlap, not the pixel width."
+   ]
+  },
+  {
+   "file": "figC_unlinkability.png",
+   "label": "Figure C",
+   "title": "Unlinkability: can two templates be tied to one person?",
+   "caption": "Figure C. Mated and non-mated score distributions with the local linkability curve D_link(s) overlaid on the right axis, held-out identities. Mated pairs are the same person protected under two different keys; non-mated pairs are two different people. The global measure D_sys appears in each panel title. Shaded bands mark score bins holding fewer than five non-mated pairs, where the curve is driven by single observations.",
+   "read_h": "How to read it",
+   "read": [
+    "An attacker holding two databases wants to know whether a template in one belongs to the same person as a template in the other. They can only do that if same-person pairs score differently from different-person pairs. So the question this figure asks is simply: do the green and grey distributions overlap?",
+    "The black curve is how much a given score tells the attacker: 0 means that score reveals nothing, 1 means it identifies the person with certainty. D_sys in the title is the average of that curve, weighted by how often each score actually occurs."
+   ],
+   "says_h": "What it says",
+   "says": [
+    "The two distributions sit almost on top of one another, which is the desired outcome. Voice reaches D_sys 0.088 and face 0.151, on a scale where zero is fully unlinkable.",
+    "Unlinkability also transfers. The external voice interval, 0.080 [0.060, 0.155], is tighter than the held-out interval and contained within it, so this is not an artifact of the corpus the configuration was selected on."
+   ],
+   "careful_h": "What not to conclude",
+   "careful": [
+    "The shaded bands are there because the mated distribution rests on one comparison per identity, 58 in total. Where the non-mated histogram is nearly empty the density ratio runs to 1 for that reason alone, not because those scores are informative. Spikes inside the shaded region should be ignored.",
+    "This figure and Figure D are built from the same mated distribution. Unlinkability and revocability are therefore one measurement viewed two ways, and the paper must not count them as independent evidence."
+   ]
+  },
+  {
+   "file": "figD_revocability.png",
+   "label": "Figure D",
+   "title": "Revocability: does a stolen template stop working?",
+   "caption": "Figure D. Genuine, impostor and pseudo-impostor distributions on one axis, held-out identities, with the sealed threshold marked. A pseudo-impostor comparison is a template whose key has been revoked, matched against the same person's new enrolment. The annotation gives the post-revocation acceptance rate for this key pair.",
+   "read_h": "How to read it",
+   "read": [
+    "Revocation works if a template stops being a valid credential once the person re-enrols under a new key. In this figure that means the green distribution should look like the grey one \u2014 a revoked template should be no more acceptable than a stranger \u2014 and it should lie to the left of the threshold.",
+    "The blue distribution is the person's current, valid template, and it should lie to the right of the threshold. So the figure is readable in one glance: green with grey on the left, blue alone on the right."
+   ],
+   "says_h": "What it says",
+   "says": [
+    "The revoked distribution sits on top of the impostor distribution and below the threshold. A revoked template behaves like a stranger, which is what revocability requires.",
+    "Across 40 fresh key sets the post-revocation acceptance rate averages 7.50% on voice and 25.60% on face, with a median of 0.00% on both. Revocation works in the median case."
+   ],
+   "careful_h": "What not to conclude",
+   "careful": [
+    "The rate printed on the figure is for the single key pair the figure is drawn from, not the 40-key average. The averages above are the numbers to quote.",
+    "The mean is far above the median because the behaviour is bimodal: 12 of 80 key sets failed to revoke at all. That failure mode is real, is unexplained, and is reported as a limitation rather than smoothed into the average.",
+    "This property is what separates the designs. Applied to the raw embedding, with no keyed compression, the acceptance rate is 100% for all 40 key sets on both modalities: a stolen template stays valid forever. The keyed compression stage is what removes that, and a keyed random linear projection does it at least as reliably as the polynomial and never failed outright."
+   ]
+  }
+ ],
+ "close_h": "What the four figures establish together",
+ "close": [
+  "The sealed system recognises unseen speakers at 1.93% equal error rate with a 93.97% true accept rate, holds that behaviour on an external corpus it was never tuned on, and is strongly unlinkable at D_sys 0.088. Protection is not free: it costs 1.84 percentage points on held-out voice and 2.79 externally, and both figures are firm rather than estimated.",
+  "Revocability is the property that separates this design from plain IoM hashing on the raw embedding, and the credit belongs to the keyed compression stage rather than to the polynomial specifically.",
+  "The face arm is descriptive only. Its encoder caps the attainable equal error rate near 3%, which is why the voice recognition floor could not be met on face and was relaxed before any evaluation identity was read, and why the face comparisons in Figure A resolve nothing."
+ ]
+}
