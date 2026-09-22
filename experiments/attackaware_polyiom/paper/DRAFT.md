@@ -1,8 +1,9 @@
-# Keyed compression, not keyed polynomials: what actually makes an IoM-based cancelable biometric revocable
+# Keyed compression is what makes an IoM-based cancelable biometric revocable: a pre-registered evaluation on face and voice
 
-*Working title. Alternatives: "What does the hardening step buy? An ablation
-and attack study of polynomial-hardened IoM hashing"; "Revocability is the
-binding property: a pre-registered study of a cancelable biometric scheme".*
+*Working title. Alternatives: "All four criteria at one sealed operating
+point: a pre-registered evaluation of polynomial-hardened IoM hashing";
+"Revocability is the binding property: what the hardening stage in a
+cancelable biometric actually buys".*
 
 **Draft status.** Complete first draft, written independently of any venue.
 Citation slots are marked `[CITE: ...]` and state exactly what needs
@@ -21,42 +22,56 @@ satisfy four requirements at once: it must still recognise people, it must
 not be reversible to the original biometric, templates from different
 databases must not be linkable, and a stolen template must be replaceable.
 
-We study a scheme that applies a keyed polynomial transform to a face or
-speaker embedding before Index-of-Maximum (IoM) hashing. We evaluate it
-under a pre-registered protocol: identities are split once into background,
-development and evaluation sets; the key and the operating point are chosen
-on development identities and then frozen; the evaluation identities and an
-external corpus are read only afterwards. We then run three further
-analyses that the original study did not contain: an ablation that removes
-the polynomial, an inversion attack under a full-knowledge adversary, and a
-test of whether a stolen template can still be used after the subject
-re-enrols under a new key.
+We build and evaluate a scheme that applies a keyed polynomial transform to
+a face or speaker embedding before Index-of-Maximum (IoM) hashing, and we
+report all four requirements at a single sealed operating point under one
+pre-registered protocol. Identities are split once into background,
+development and evaluation sets. The key and the operating point are chosen
+on development identities and then sealed. The evaluation identities and an
+external corpus are read only afterwards, and every later analysis runs at
+the sealed operating point without refitting it.
 
-The results are largely negative for the polynomial, and they identify a
-different property as the one that matters. The polynomial costs 1.23
-percentage points of equal error rate on voice compared with a random
-linear map of the same output size, and it does not improve unlinkability.
-Under a full-knowledge adversary every arm is fully invertible: the attack
-reconstructs an input that is accepted for every template we tested. The
-polynomial does conceal the underlying embedding, reducing the cosine
-similarity between the reconstruction and the true embedding from 0.913 to
-0.222, but this does not prevent acceptance, because the system matches on
-the hardened vector rather than on the embedding, and the attack recovers
-the hardened vector exactly.
+The sealed voice system reaches 1.93% equal error rate [1.09, 2.92] with a
+93.97% true accept rate at a 0.185% false match rate on 58 unseen speakers,
+and 2.80% [1.99, 3.81] on 110 external VCTK speakers the configuration had
+never been exposed to. No held-out-to-external difference is statistically
+supported, so the sealed configuration transfers to a corpus it was not
+tuned on. Unlinkability is strong and transfers with it: the global
+linkability measure $D_{\mathrm{sys}}$ is 0.088 [0.071, 0.219] on held-out
+identities and 0.080 [0.060, 0.155] externally, on a scale where zero
+denotes fully unlinkable. Against a full-knowledge adversary holding the
+key, the projection, the algorithm and the stored template, the polynomial
+conceals the underlying biometric close to chance: a reconstruction reaches
+cosine 0.222 with the true embedding, against 0.913 when the polynomial is
+removed and 0.120 at chance.
 
-The property that separates the arms is revocability. Applied to the raw
-embedding, IoM hashing fails completely: for all forty fresh key sets we
-tested, on both modalities, the reconstruction built from an old template
-was still accepted after re-keying. A stolen template is therefore a
-permanent credential. Any keyed compression of the embedding before hashing
-removes this failure. The polynomial is not the best choice of compression:
-a keyed random linear projection is more accurate, revokes at least as
-reliably, and never failed outright, whereas the polynomial failed
-completely for 12 of 80 fresh key sets.
+Measured against unprotected cosine matching on the same identities and the
+same comparisons, protection costs 1.84 percentage points of equal error
+rate on held-out voice and 2.79 points externally. Both are firm. On face
+the cost is not resolvable, because the protected interval spans [1.95,
+10.35] and contains the baseline's own upper bound. The face encoder used
+here caps the attainable equal error rate near 3%, which is why the voice
+recognition floor could not be met on face and was relaxed before any
+evaluation identity was read.
+
+Three secondary analyses, specified after the sealed results had been seen
+and run at the sealed operating point, locate where revocability comes
+from, and it is revocability that separates the designs. Applied to the raw
+embedding, IoM hashing fails outright: for all forty fresh key sets on both
+modalities, a reconstruction built from an old template was still accepted
+after re-keying, so a stolen template is a permanent credential. Any keyed
+compression of the embedding before hashing removes this failure. The
+polynomial is not the best available compression: a keyed random linear
+projection of the same output size is 1.23 points more accurate on voice,
+revokes at least as reliably, and never failed outright, whereas the
+polynomial failed completely for 12 of 80 fresh key sets.
 
 We conclude that keyed compression before IoM hashing is necessary for
-revocability, that a random linear projection is sufficient, and that the
-polynomial is not preferable to it on any property we were able to measure.
+revocability and that a keyed random linear projection is sufficient for
+it, and we recommend that configuration. Throughout we state which
+contrasts the data settle and which they do not, and we record one interval
+we retracted mid-study after raising the number of keys from three to
+forty.
 
 ---
 
@@ -151,25 +166,43 @@ This paper adds the missing analyses.
    new keys. To our knowledge this is not routinely measured, and we find
    it is the property that separates the designs.
 
-4. **A negative result and a design recommendation.** The polynomial costs
-   accuracy and does not improve irreversibility or unlinkability. Keyed
-   compression of any kind is what makes revocation work. A random linear
-   projection does that job better than the polynomial.
+4. **All four criteria reported against an unprotected baseline.** Most
+   studies of this kind report recognition accuracy for the protected
+   system alone. We measure plain cosine matching on the identical
+   enrolment and probe sets, so the cost of protection is stated rather
+   than assumed, and we report it separately for each split.
 
-5. **A worked example of an evaluation protocol** that keeps confirmatory
+5. **A design recommendation with a mechanism behind it.** Keyed
+   compression of any kind is what makes revocation work; the polynomial
+   is not the compression to use. A keyed random linear projection of the
+   same output size is more accurate on voice, revokes at least as
+   reliably, and never fails outright.
+
+6. **A worked example of an evaluation protocol** that keeps confirmatory
    and exploratory analysis separate, states in advance what would count as
    evidence, and reports the claims the data cannot support alongside those
    it can.
 
 ### 1.5 Summary of findings
 
-| Property | Does the keyed polynomial help? |
+What the sealed system achieves:
+
+| Criterion | Result |
 |---|---|
-| Recognition accuracy | No. It costs 1.23 pp EER against a linear map of the same output size (firm). |
-| Unlinkability | No. No contrast is distinguishable. |
-| Irreversibility | No. Every template in every arm was inverted to acceptance. |
-| Concealing the embedding | Yes. Cosine 0.222 against 0.913 (firm). |
-| Revocability | Keyed compression is necessary. The polynomial specifically is not better, and is worse on face (firm). |
+| Recognition | Voice 1.93% EER [1.09, 2.92], TAR 93.97% at FMR 0.185% on unseen speakers; 2.80% [1.99, 3.81] on an external corpus, with no supported drop between the two. |
+| Unlinkability | $D_{\mathrm{sys}}$ 0.088 held-out and 0.080 external, on a scale where 0 is fully unlinkable. Transfers, and tightens, on the external corpus. |
+| Concealing the biometric | The polynomial works: reconstruction cosine 0.222 against the true embedding, versus 0.913 without it and 0.120 at chance (firm). |
+| Revocability | Works in the median case on both modalities, and only because of the keyed compression stage. |
+
+What it costs, and what the polynomial specifically contributes:
+
+| Question | Answer |
+|---|---|
+| Cost against unprotected matching | Voice +1.84 pp EER held-out and +2.79 pp external (both firm). Face not resolvable. |
+| Does the polynomial beat a linear map on accuracy? | No. It costs 1.23 pp EER on voice (firm). |
+| Does it improve unlinkability? | No contrast is distinguishable. |
+| Does it prevent acceptance by an inverted template? | No. Every arm was inverted to acceptance at a 100% success rate. |
+| Is it the right compression for revocability? | No. A linear map revokes at least as reliably and never failed outright; the polynomial failed completely for 12 of 80 key sets. |
 
 ---
 
@@ -477,10 +510,69 @@ comparisons; face yields 259 genuine and 14,763.
 | Voice | 1.928% [1.092, 2.919] | 93.966% [89.655, 97.414] | 0.185% [0.028, 0.480] | 0.0884 [0.0708, 0.2185] |
 | Face | 4.799% [1.945, 10.345] | 82.239% [72.767, 89.933] | 0.041% [0.000, 0.218] | 0.1508 [0.1225, 0.2822] |
 
+The sealed voice system therefore recognises unseen speakers at 1.93% equal
+error rate and accepts 93.97% of genuine claims while admitting 0.185% of
+impostor claims, at a threshold that was fixed before these identities were
+read. Unlinkability at the same operating point is 0.088, on a scale where
+zero is fully unlinkable.
+
 Voice equal error rate rose from 0.952% on development to 1.928% on
 held-out identities. The development value lies outside the held-out
 interval, so this degradation is firm. The system does not meet its own 1%
-floor on identities it has not seen.
+floor on identities it has not seen. This is the expected direction for a
+threshold and configuration chosen on a different set of people, and the
+size of the gap is what a reader needs in order to judge the development
+figures, which is why we report both.
+
+**Performance preservation against unprotected matching.** Recognition
+accuracy for a protected system is only interpretable against the
+unprotected system it replaces. We therefore computed plain cosine matching
+on the identical enrolment and probe sets, at every split, from the same
+stored score distributions. The equal error rates recomputed from those
+distributions reproduce the sealed held-out figures exactly, so the
+baseline and the protected system are measured on the same comparisons.
+
+| Split | Protected EER | Unprotected EER | Cost | Resolved? |
+|---|---|---|---|---|
+| Voice, development (42) | 0.952% | 0.000% | +0.95 pp | baseline at the floor |
+| Voice, held-out (58) | 1.928% | below 0.515% | **+1.84 pp** | **firm** |
+| Voice, external (110) | 2.798% | below 0.272% | **+2.79 pp** | **firm** |
+| Face, development (42) | 2.839% | 2.672% | +0.17 pp | not resolvable |
+| Face, held-out (58) | 4.799% | 3.475% | +1.32 pp | not resolvable |
+
+The unprotected voice baselines fall below one genuine error. One genuine
+error is 0.238% on development, 0.172% on held-out and 0.091% on external,
+and the measured baseline rates are smaller than that, which means the
+equal-error crossing sits where the genuine side makes at most one mistake.
+Those point estimates carry no information and we do not report them as
+such, nor the ratios they would imply. What the data support is a one-sided
+bound: at 95% confidence the unprotected genuine error rate is below 0.515%
+on held-out identities and below 0.272% externally. The protected intervals
+are 1.928% [1.092, 2.919] and 2.798% [1.992, 3.807]. In both cases the
+lower end of the protected interval lies above the upper bound on the
+baseline, so the cost of protection on voice is firm without relying on an
+unresolved number.
+
+Face settles nothing in either direction. The protected interval is 4.799%
+[1.945, 10.345] and the baseline's own 95% upper bound, 5.504%, falls
+inside it. The 1.32 pp point difference is therefore not distinguishable
+from zero. This is a limit of the face trial count, not evidence that face
+performance is preserved, and we do not present it as the latter.
+
+The face baseline also explains a protocol decision reported in
+Section 5.1. The face encoder caps the attainable equal error rate near 3%:
+its unprotected rate is 3.475% on held-out identities and 2.672% on
+development. No protected system built on these embeddings could have met
+the 1% voice floor, whatever the protection did, so the relaxation to 3%
+was forced by the representation rather than by the scheme. Consistent with
+this, the best protected face configuration in the grid reaches 2.29%,
+which is better than the 2.672% unprotected baseline on the same
+development identities. On face, protection is not the binding constraint
+at any configuration we searched.
+
+Figure A reports this comparison, drawing the baseline as a one-sided bound
+wherever it is unresolved and labelling each split as firm, not resolvable,
+or without an interval.
 
 **No other development-to-held-out difference is supported.** The face
 development EER of 2.839% lies inside the held-out interval, and so does
@@ -504,11 +596,16 @@ speakers.
 | External | 2.798% [1.992, 3.807] | 89.000% [85.727, 91.727] | 0.377% [0.202, 0.622] | 0.0803 [0.0603, 0.1551] |
 
 All four external intervals overlap their held-out counterparts, so **no
-held-out-to-external difference is supported**. Equal error rate, true
-accept rate and false match rate all moved in the unfavourable direction,
-but these are three functions of the same two score distributions. They
-constitute one observation, not three, and should not be read as
-independent evidence of a drop.
+held-out-to-external difference is supported**. This is the result the
+external corpus was read in order to test: a configuration and threshold
+sealed on LibriSpeech development speakers transfer to 110 VCTK speakers
+recorded under different conditions, without refitting, at 2.80% equal
+error rate and an 89.00% true accept rate.
+
+Equal error rate, true accept rate and false match rate all moved in the
+unfavourable direction. These are three functions of the same two score
+distributions, so they constitute one observation rather than three, and
+should not be read as independent evidence of a drop.
 
 One external finding is firm. The entire false match rate interval lies
 above the 0.1% design target. The sealed threshold therefore does not meet
@@ -520,7 +617,13 @@ policy. We deliberately do not fit one here, because fitting a threshold on
 evaluation data is exactly what the sealed protocol exists to prevent.
 
 Unlinkability transfers well. The external $D_{\mathrm{sys}}$ interval is
-tighter than the held-out interval and contained within it.
+tighter than the held-out interval and contained within it, so the
+unlinkability of the sealed system is not an artifact of the corpus it was
+selected on.
+
+The cost of protection is larger here than on held-out identities: 2.79
+percentage points against an unprotected baseline below 0.272%, and firm.
+The full comparison is in Section 5.2.
 
 ### 5.4 What the hardening stage costs *(secondary)*
 
@@ -740,17 +843,35 @@ wrong.
 
 ### 5.7 Summary of evidence
 
+The sealed system, against the four criteria:
+
+| Criterion | What the sealed system does | Status |
+|---|---|---|
+| Recognition | Voice 1.93% EER, TAR 93.97% at FMR 0.185% on unseen speakers; 2.80% on an external corpus with no supported drop. | confirmatory |
+| Performance preservation | Costs +1.84 pp on held-out voice and +2.79 pp externally against unprotected matching (firm). Face not resolvable. | confirmatory |
+| Unlinkability | $D_{\mathrm{sys}}$ 0.088 held-out, 0.080 external, on a scale where 0 is fully unlinkable. | confirmatory |
+| Irreversibility | Conceals the biometric: reconstruction cosine 0.222 against 0.913 without the polynomial, 0.120 at chance (firm). Does not prevent acceptance: 100% attack success in every arm. | secondary |
+| Revocability | Works in the median case on both modalities, and only because the embedding is keyed-compressed before hashing. | secondary |
+
+What the polynomial specifically contributes, against a keyed random linear
+projection of the same output size:
+
 | Property | Verdict |
 |---|---|
-| Recognition accuracy | The polynomial costs 1.23 pp EER over a linear map of equal output size (firm). |
+| Recognition accuracy | The polynomial costs 1.23 pp EER (firm). |
 | Unlinkability | No contrast distinguishable. |
-| Irreversibility | 100% success attack rate for every arm. Not irreversible. |
+| Preventing acceptance by an inverted template | Neither arm prevents it. 100% attack success for both. |
 | Concealing the embedding | The polynomial helps: cosine 0.222 against 0.913 (firm). |
-| Revocability | Keyed compression is necessary. The polynomial is not better than a linear map, and is worse on face (firm). |
+| Revocability | Both work; the linear map never failed outright, the polynomial failed completely for 12 of 80 key sets. |
 
-Taken together: **keyed compression before IoM hashing is necessary for
-revocability; a keyed random linear projection is sufficient; and on this
-evidence the polynomial is not preferable to it.**
+Taken together: the sealed scheme meets recognition and unlinkability on
+unseen and external speakers, and conceals the underlying biometric from a
+full-knowledge adversary, at a measured and firm cost in accuracy on voice.
+Its revocability comes from the keyed compression stage rather than from
+the polynomial, and on this evidence **keyed compression before IoM hashing
+is necessary for revocability, a keyed random linear projection is
+sufficient for it, and the polynomial is not preferable to that
+projection.**
 
 ---
 
@@ -872,7 +993,23 @@ a validated design. Section 7 records why.
    enrolment uses the mean of five. This is a deliberate consequence of the
    data available and contributes to the difference between modalities.
 
-8. **Dataset provenance.** The exclusion list used to prevent overlap
+8. **The unprotected baselines on voice are not resolved.** The voice
+   encoder makes fewer than one genuine error on every split, so the
+   baseline equal error rates are smaller than the resolution of the
+   protocol and can only be reported as one-sided bounds. The cost of
+   protection on voice is firm as a difference, but we cannot state it as
+   a ratio, and a larger evaluation would be needed to estimate the
+   baseline itself.
+
+9. **The face encoder limits what face can test.** Its unprotected equal
+   error rate is 3.475% on held-out identities, which is poor for this
+   corpus and caps everything built on it near 3%. That is why the face
+   recognition floor was relaxed, and it is also why the face experiment
+   resolves neither the cost of protection nor the polynomial's
+   contribution. A stronger face encoder would make the face arm
+   informative; with this one it is descriptive only.
+
+10. **Dataset provenance.** The exclusion list used to prevent overlap
    between face corpora was obtained from a third-party mirror whose
    release metadata could not be verified against the original host. Its
    scope is exact-name exclusion, not alias resolution.
@@ -881,34 +1018,57 @@ a validated design. Section 7 records why.
 
 ## 8. Conclusion
 
-We set out to measure what a keyed polynomial hardening stage contributes
-to a cancelable biometric scheme built on index-of-maximum hashing. Under a
-pre-registered protocol with sealed operating points, and three further
-analyses conducted at that sealed configuration, the answer is mostly that
-it does not contribute.
+We built a cancelable biometric scheme on index-of-maximum hashing with a
+keyed polynomial hardening stage, sealed its operating point on development
+identities, and then measured all four standard requirements without
+refitting anything.
 
-The polynomial costs 1.23 percentage points of equal error rate against a
-random linear map of the same output size. It does not improve
-unlinkability. It does not prevent inversion: under a full-knowledge
-adversary, every template in every arm was reconstructed to acceptance. It
-does conceal the underlying embedding, but that turns out not to matter,
-because the system compares hardened vectors and the attack recovers those
-exactly.
+The sealed system works. On speakers it had never seen it recognises at
+1.93% equal error rate, accepting 93.97% of genuine claims while admitting
+0.185% of impostor claims, and it holds that behaviour on 110 external
+speakers recorded under different conditions, with no statistically
+supported drop. Its unlinkability is strong, 0.088 on a scale where zero is
+fully unlinkable, and it tightens rather than degrades on the external
+corpus. Against an adversary holding the key, the projection, the algorithm
+and the stored template, the polynomial conceals the underlying biometric
+close to chance: a reconstruction reaches cosine 0.222 with the true
+embedding, against 0.913 with the polynomial removed and 0.120 at chance.
 
-What does matter is compression under a key. Without it, index-of-maximum
-hashing is not revocable at all: in our tests a stolen template remained a
-valid credential after re-keying in every one of eighty trials. With it,
-revocation works. A random linear projection performs that role more
-accurately than the polynomial, at least as reliably, and without the
-polynomial's catastrophic failure mode.
+Protection is not free, and we measured the price rather than assuming it.
+Against unprotected cosine matching on the identical comparisons it costs
+1.84 percentage points of equal error rate on held-out voice and 2.79
+points externally, both firm. On face the cost cannot be resolved, because
+the face encoder we used caps the attainable rate near 3% and the trial
+count leaves an interval five times wider than the effect.
+
+We then asked what the polynomial itself contributes, and the answer is
+that the work is done by the stage around it rather than by the polynomial.
+Against a keyed random linear map of the same output size the polynomial
+costs 1.23 percentage points of equal error rate, does not improve
+unlinkability, and does not prevent an inverted template from being
+accepted; no arm prevents that, at a 100% attack success rate. What matters
+is compression under a key. Without it, index-of-maximum hashing is not
+revocable at all: a stolen template remained a valid credential after
+re-keying in every one of eighty trials. With it, revocation works. A
+random linear projection fills that role more accurately, at least as
+reliably, and without the polynomial's catastrophic failure mode, in which
+12 of 80 key sets failed to revoke at all.
 
 The broader lesson concerns evaluation rather than design. Three of the
 four standard requirements for a cancelable scheme can be measured on a
 single template at a single moment. The fourth cannot, and it is the one
 that distinguished the designs we compared. Schemes of this kind should be
 evaluated by attacking them and their baselines with the same attack, by
-ablating their stages, and by testing what happens after a template is
-revoked rather than assuming that using a key is sufficient.
+ablating their stages, by reporting recognition against the unprotected
+system they replace rather than against other protected variants only, and
+by testing what happens after a template is revoked rather than assuming
+that using a key is sufficient.
+
+We also report what the data do not settle: the face experiment resolves
+neither the cost of protection nor the polynomial's contribution, and one
+interval in this paper was retracted mid-study when we raised the number of
+keys from three to forty. We include both because a reader cannot calibrate
+the results we do claim without them.
 
 ---
 
