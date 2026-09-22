@@ -69,10 +69,12 @@ of 80 fresh key sets, and every subject's for 8 of them.
 
 We conclude that keyed compression before IoM hashing is necessary for
 revocability and that a keyed random linear projection is sufficient for
-it, and we recommend that configuration. Throughout we state which
-contrasts the data settle and which they do not, and we record one interval
-we retracted mid-study after raising the number of keys from three to
-forty.
+it, while the polynomial specifically is what conceals the biometric from
+a full-knowledge adversary. The choice between them is a trade between
+concealment on one side and accuracy and reliable revocation on the other,
+and we state it as one. Throughout we say which contrasts the data settle
+and which they do not, and we record one interval we retracted mid-study
+after raising the number of keys from three to forty.
 
 ---
 
@@ -83,69 +85,95 @@ forty.
 Passwords can be changed. Biometrics cannot. If a database of face
 embeddings is stolen, the people in it cannot be issued new faces. This is
 the central difficulty in deploying biometric recognition at scale, and it
-is the reason template protection is required by standards for biometric
+is why template protection is required by the standard for biometric
 information protection `[CITE: ISO/IEC 24745 biometric information
 protection]`.
 
 Cancelable biometrics are one response. Instead of storing the biometric
-feature vector, the system stores a transformed version of it. The
+feature vector, the system stores a transformed version of it, and the
 transform depends on a key. If the stored template is compromised, the
-operator issues a new key, the subject re-enrols, and the old template
-becomes useless. The biometric itself never has to change.
+operator issues a new key, the subject re-enrols, and the old template is
+meant to stop working. The biometric itself never has to change.
 
-A scheme of this kind is usually required to satisfy four properties at
-once `[CITE: standard formulation of the four criteria]`:
+A scheme of this kind has to satisfy four properties at once `[CITE:
+standard formulation of the four criteria]`:
 
 1. **Recognition performance.** Protected templates must still tell people
    apart about as well as unprotected ones.
 2. **Irreversibility.** An attacker who obtains a stored template must not
    be able to recover the underlying biometric.
-3. **Unlinkability.** Templates of the same person held in two different
-   databases, protected with different keys, must not be identifiable as
-   belonging to the same person.
+3. **Unlinkability.** Templates of the same person held in two databases,
+   protected with different keys, must not be identifiable as belonging to
+   the same person.
 4. **Revocability.** A compromised template must be replaceable, and the
    old one must stop working.
 
-These four are in tension. A transform that destroys enough information to
-be irreversible usually also destroys the information needed for
-recognition. Most of the literature in this area reports the first three
-and treats the fourth as following automatically from the use of a key.
+The first three can be measured on a single template at a single moment.
+The fourth cannot. To test whether an old template stops working, one has
+to enrol the same people again under a fresh key and then try the old
+template against the new system. That is a different experiment, it is
+rarely run, and the usual practice is to treat revocability as following
+automatically from the use of a key. This paper runs that experiment, and
+finds that it is the one that tells the designs apart.
 
-### 1.2 What we study
+### 1.2 The scheme
 
-We study a scheme that combines two stages. First, a keyed polynomial is
-applied to overlapping windows of the biometric embedding. We refer to this
-as *hardening*. Second, the hardened vector is passed through
-Index-of-Maximum (IoM) hashing, which projects it many times and stores
-only which projection was largest in each group `[CITE: IoM hashing, Jin et
-al.]`. The combination is intended to be harder to invert than IoM hashing
-alone, because the polynomial stage is keyed and non-linear.
+We study a scheme with two stages. First, a keyed polynomial is applied to
+overlapping windows of the biometric embedding; we call this *hardening*.
+Second, the hardened vector is passed through Index-of-Maximum (IoM)
+hashing, which projects it many times under a second key and stores only
+which projection was largest in each group `[CITE: IoM hashing, Jin et
+al.]`. The hardening stage is keyed and non-linear, and it also compresses
+the embedding, so it does two things at once. Separating them is one of
+the tasks of this paper.
 
 The scheme was evaluated under a pre-registered protocol. One hundred and
-fifty identities per modality were split once, from a fixed random seed,
-into three disjoint sets: fifty background identities used to search for
-the polynomial key, forty-two development identities used to choose the
+fifty identities per modality were split once, from a fixed seed, into
+three disjoint sets: fifty background identities used to search for the
+polynomial key, forty-two development identities used to choose the
 operating point, and fifty-eight evaluation identities that were not read
-until the configuration was frozen. An external voice corpus was read last
-of all. This is stricter than common practice in the area, where thresholds
-are often chosen on the same data used to report results.
+until the configuration was sealed. An external voice corpus was read last
+of all. Nothing was refitted after sealing, and every analysis in the
+paper ran at the sealed operating point.
 
-### 1.3 What was missing
+### 1.3 What this paper asks
 
-The pre-registered study measured how well the complete scheme performs. It
-did not measure what the polynomial stage contributes. The parameter sweep
-varied the number of hash groups, the number of projections per group, and
-the window overlap. All three are parameters of the hashing stage or of the
-windowing; none of them removes the polynomial. There was therefore no
-evidence in the study that the polynomial does anything at all.
+Three questions, in order. Each is answered with a measured mechanism, not
+only with a number.
 
-The study also did not contain an attack. The scheme is described as
-resisting inversion, and the polynomial key was selected using an inversion
-stress test, but that test was a selection criterion applied to candidate
-keys on background identities. It was never used to evaluate the final
-system. Irreversibility was asserted rather than measured.
+**Is IoM hashing on a raw embedding revocable?** It is not. Under an
+adversary who holds the key, the projection, the algorithm and the stored
+template, the attack recovers the embedding itself (cosine 0.913 to the
+truth on voice). An embedding does not depend on any key, so re-keying
+changes nothing: the adversary re-enrols through the new key and is
+accepted. Across forty fresh key sets on each of two modalities, every
+old template remained a working credential. A stolen template is
+permanent.
 
-This paper adds the missing analyses.
+**What makes it revocable?** Keyed compression of the embedding before
+the hash. With it, the attack finds only a vector that collides *under
+the old key*, not the embedding, and that vector is worthless under a new
+one. This holds for the polynomial and equally for a keyed random linear
+projection of the same output size. The third arm exists to isolate this:
+it separates "compression under a key" from "this particular polynomial",
+and shows the credit belongs to the former.
+
+**What does the polynomial itself buy?** Concealment of the biometric. A
+linear map is pseudo-invertible: an adversary who holds it recovers the
+component of the embedding in its row space, cosine 0.49. The polynomial
+is non-linear and many-to-one; the attack lands on a pre-image that
+collides, not on the embedding, cosine 0.22 against chance 0.12. The gap
+is firm on both modalities. This is the irreversibility criterion in the
+sense that carries the privacy weight: a spoofed credential can be
+revoked, a recovered face or voice cannot. The polynomial pays for it in
+accuracy, 1.23 percentage points of equal error rate on voice, and in a
+failure mode under some keys that the linear map does not share.
+
+Together these give the paper's thesis. *Keyed compression is what makes
+an IoM-based scheme revocable. The polynomial is what makes the biometric
+hard to recover. The two are separable, and the choice between a
+polynomial and a linear map is a trade between concealment on one side
+and accuracy and reliability on the other, not a dominance.*
 
 ### 1.4 Contributions
 
@@ -173,11 +201,12 @@ This paper adds the missing analyses.
    enrolment and probe sets, so the cost of protection is stated rather
    than assumed, and we report it separately for each split.
 
-5. **A design recommendation with a mechanism behind it.** Keyed
-   compression of any kind is what makes revocation work; the polynomial
-   is not the compression to use. A keyed random linear projection of the
-   same output size is more accurate on voice, revokes at least as
-   reliably, and never fails outright.
+5. **A separation of what the two keyed stages do, with the mechanism
+   behind each.** Keyed compression of any kind is what makes revocation
+   work, and a linear map suffices. The polynomial specifically is what
+   conceals the biometric from a full-knowledge adversary, because it is
+   many-to-one where a linear map is pseudo-invertible. The two are
+   separable, and we state the trade between them rather than a winner.
 
 6. **A worked example of an evaluation protocol** that keeps confirmatory
    and exploratory analysis separate, states in advance what would count as
@@ -203,7 +232,9 @@ What it costs, and what the polynomial specifically contributes:
 | Does the polynomial beat a linear map on accuracy? | No. It costs 1.23 pp EER on voice (firm). |
 | Does it improve unlinkability? | No contrast is distinguishable. |
 | Does it prevent acceptance by an inverted template? | No. Every arm was inverted to acceptance at a 100% success rate. |
-| Is it the right compression for revocability? | No. A linear map revokes at least as reliably and never failed for as many as half the subjects under any key; the polynomial did so for 12 of 80 key sets, and failed for every subject under 8 of them. |
+| Does it conceal the biometric better than a linear map? | Yes, firmly on both modalities: reconstruction cosine 0.222 against 0.490 on voice, 0.418 against 0.492 on face. |
+| Is it the more reliable compression for revocability? | No. A linear map revokes at least as reliably and never failed for as many as half the subjects under any key; the polynomial did so for 12 of 80 key sets, and failed for every subject under 8 of them. |
+| So which should one use? | It is a trade: the polynomial for concealment of the biometric, the linear map for accuracy and reliable revocation. Section 6.4. |
 
 ---
 
@@ -869,10 +900,11 @@ Taken together: the sealed scheme meets recognition and unlinkability on
 unseen and external speakers, and conceals the underlying biometric from a
 full-knowledge adversary, at a measured and firm cost in accuracy on voice.
 Its revocability comes from the keyed compression stage rather than from
-the polynomial, and on this evidence **keyed compression before IoM hashing
-is necessary for revocability, a keyed random linear projection is
-sufficient for it, and the polynomial is not preferable to that
-projection.**
+the polynomial, while the concealment of the biometric comes from the
+polynomial specifically. On this evidence **keyed compression before IoM
+hashing is necessary for revocability and a keyed random linear projection
+is sufficient for it; the polynomial is what makes the biometric hard to
+recover, and the choice between the two is a trade, not a dominance.**
 
 ---
 
@@ -936,13 +968,26 @@ intervals that account for the key.
 ### 6.4 Design recommendation
 
 On the evidence here, a practitioner building a cancelable scheme on IoM
-hashing should compress the embedding under a key before hashing, and
-should use a random linear projection to do it. Compression is necessary:
-without it, revocation does not work and a stolen template is permanent.
-The polynomial is not required: it costs accuracy, adds a catastrophic
-failure mode, and improves nothing we could measure other than
-reconstruction fidelity, which does not translate into resistance to
-acceptance.
+hashing should compress the embedding under a key before hashing. That
+part is not optional: without it, revocation does not work and a stolen
+template is permanent.
+
+Which compression to use is a trade, and we state it as one. A keyed
+random linear projection is more accurate (by 1.23 percentage points of
+equal error rate on voice), revokes at least as reliably, and never left
+half the subjects exposed under any key. The keyed polynomial conceals the
+underlying biometric far better: the reconstruction reaches cosine 0.22
+with the true embedding against 0.49 for the linear map on voice, and
+0.42 against 0.49 on face, both firm. Neither prevents an inverted
+template from being accepted; that is what revocation is for.
+
+So the choice turns on the threat model. Where the harm that matters is a
+compromised credential, which re-keying repairs, the linear map is the
+better engineering choice. Where the harm that matters is recovery of the
+face or voice itself, which nothing repairs, the polynomial buys real
+protection at a measured cost. A deployment that must satisfy a privacy
+regulator would reasonably weigh the second harm more heavily than a
+deployment that only has to keep impostors out.
 
 We state this as a recommendation supported by held-out comparison, not as
 a validated design. Section 7 records why.
@@ -984,11 +1029,11 @@ a validated design. Section 7 records why.
    on face, is likewise unexplained. This is the weakest point in the
    argument of Section 5.6.
 
-6. **The preferred configuration was never sealed.** `randproj_iom` was
+6. **The linear-map arm was never sealed.** `randproj_iom` was
    introduced as an ablation arm. It has no operating point selected under
-   the pre-registered rule, and no external validation. The recommendation
-   in Section 6.4 therefore rests on a held-out comparison conducted at
-   PolyIoM's sealed configuration, not on the full protocol.
+   the pre-registered rule, and no external validation. Its side of the
+   trade stated in Section 6.4 therefore rests on a held-out comparison
+   conducted at PolyIoM's sealed configuration, not on the full protocol.
 
 7. **Asymmetric enrolment.** Face enrolment uses a single embedding; voice
    enrolment uses the mean of five. This is a deliberate consequence of the
@@ -1050,11 +1095,17 @@ unlinkability, and does not prevent an inverted template from being
 accepted; no arm prevents that, at a 100% attack success rate. What matters
 is compression under a key. Without it, index-of-maximum hashing is not
 revocable at all: a stolen template remained a valid credential after
-re-keying in every one of eighty trials. With it, revocation works. A
-random linear projection fills that role more accurately, at least as
-reliably, and without the polynomial's catastrophic failure mode, in which
-12 of 80 key sets left at least half the subjects' old templates
-still working, and 8 of those left every subject's working.
+re-keying in every one of eighty trials. With it, revocation works, and a
+random linear projection does that job more accurately, at least as
+reliably, and without the polynomial's failure mode, in which 12 of 80 key
+sets left at least half the subjects' old templates still working, and 8
+of those left every subject's working. What the polynomial does that the
+linear map does not is conceal the biometric: an inverted PolyIoM template
+gives back the true embedding at cosine 0.22 on voice, against 0.49 for
+the linear map and 0.91 with no keyed compression at all. That is the
+irreversibility criterion in the sense that matters for privacy, and the
+polynomial pays for it in accuracy. We state the choice as the trade it
+is.
 
 The broader lesson concerns evaluation rather than design. Three of the
 four standard requirements for a cancelable scheme can be measured on a

@@ -141,7 +141,7 @@ them as independent evidence.
   spans a five-fold range.
 - The unprotected voice baselines fall below one genuine error, so they
   are reported as one-sided bounds rather than point estimates.
-- `randproj_iom`, which the paper recommends over the polynomial, was
+- `randproj_iom`, one side of the trade the paper states, was
   never itself put through the sealed selection protocol. It was only ever
   evaluated at the polynomial's operating point.
 - One interval was retracted during the study. The first revocation

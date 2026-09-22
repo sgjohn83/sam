@@ -71,8 +71,8 @@ has to find them:
    reported as one-sided 95% bounds, never as point estimates, and no
    ratio is quoted.
 
-3. **The recommended configuration was never sealed.** `randproj_iom` is
-   recommended over the polynomial but was only ever evaluated at the
+3. **The linear-map arm was never sealed.** `randproj_iom` is one side
+   of the trade the paper states, but was only ever evaluated at the
    polynomial's operating point, not put through the selection protocol
    itself.
 
