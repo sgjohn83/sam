@@ -18,11 +18,32 @@ The file is a few kilobytes rather than a few megabytes, and nothing is
 approximated. The evaluation already builds these histograms internally
 and discards them; this cell keeps them.
 
-Covers the proposed system only - the arms belong to the ablation, not to
-the results - on the development and evaluation partitions of both
-modalities, plus the external VCTK corpus for voice when its embeddings
-are present.
+Covers two systems, because the first criterion a cancelable-biometric
+paper has to address is performance PRESERVATION, which is reported as the
+protected system against the UNPROTECTED one:
+
+  protected     the sealed pipeline, integer collision scores in 0..M
+  unprotected   plain cosine similarity between the same embeddings
+
+Cosine is continuous, so the unprotected side is binned finely over
+[-1, 1] and the bin edges are stored with it. At 2000 bins the resolution
+is 0.001, which is far finer than any DET curve needs.
+
+Also stores the LOCAL unlinkability curve D_link(s) alongside the global
+value. The global value is what the evaluation already reports; the local
+curve is the part that is plottable, and it is the standard unlinkability
+figure in this literature.
+
+Note that the mated distribution serves two figures at once. Under the
+unlinkability framework it is "same subject, two different keys"; under
+revocability it is the pseudo-impostor distribution. They are the same
+measurement, and a paper should not present them as independent evidence.
+
+Partitions: development and evaluation for both modalities, plus external
+VCTK for voice when its embeddings are present.
 """
+
+COS_BINS = 2000
 
 SCORE_OUTPUT = None          # set in run_score_dump
 
@@ -120,6 +141,90 @@ def histograms_for(modality, subjects, enroll, probes, M, q, overlap, key,
             "n_impostor": int(impostor.sum())}
 
 
+def cosine_histograms(subjects, enroll, probes, nbins=COS_BINS):
+    """Unprotected baseline: plain cosine between the same embeddings.
+
+    This is the reference the protected system has to be compared against.
+    Binned over [-1, 1] rather than stored raw: 2000 bins is 0.001
+    resolution and a few kilobytes instead of megabytes.
+    """
+    def unit(a):
+        a = np.asarray(a, dtype=np.float64)
+        return a / max(np.linalg.norm(a), 1e-12)
+
+    E = np.stack([unit(enroll[uid]) for uid in subjects])
+    rows, owners = [], []
+    for index, uid in enumerate(subjects):
+        for v in probes[uid]:
+            rows.append(unit(v))
+            owners.append(index)
+    P = np.stack(rows)
+    scores = P @ E.T                                  # (probes, subjects)
+
+    edges = np.linspace(-1.0, 1.0, nbins + 1)
+    own = np.asarray(owners)
+    mask = np.zeros_like(scores, dtype=bool)
+    mask[np.arange(len(own)), own] = True
+    gen, _ = np.histogram(scores[mask], bins=edges)
+    imp, _ = np.histogram(scores[~mask], bins=edges)
+    return {"genuine": gen.tolist(), "impostor": imp.tolist(),
+            "bin_edges": [float(edges[0]), float(edges[-1])],
+            "n_bins": int(nbins),
+            "n_genuine": int(gen.sum()), "n_impostor": int(imp.sum())}
+
+
+def unlinkability_curve(mated, nonmated):
+    """Local D_link(s) and the global value, from the same histograms.
+
+    The global value is what the evaluation already reports. The local
+    curve is what a figure needs.
+    """
+    m = np.asarray(mated, float)
+    n = np.asarray(nonmated, float)
+    if m.sum() <= 0 or n.sum() <= 0:
+        return [], float("nan")
+    pm, pn = m / m.sum(), n / n.sum()
+    local = np.zeros_like(pm)
+    for s_ in range(len(pm)):
+        if pm[s_] == 0:
+            local[s_] = 0.0
+        elif pn[s_] == 0:
+            local[s_] = 1.0
+        else:
+            ratio = pm[s_] / pn[s_]
+            local[s_] = 0.0 if ratio <= 1 else 2 * ratio / (1 + ratio) - 1
+    return local.tolist(), float(np.sum(pm * local))
+
+
+def eer_cosine(hist_gen, hist_imp):
+    """EER from a binned continuous score, for the unprotected baseline.
+
+    The exact-zero branch is not optional here. When the two distributions
+    are well separated there is a run of thresholds at which FAR and FRR
+    are both zero, so FAR - FRR never changes sign between adjacent bins
+    and a crossing-only search returns nothing. The unprotected baseline
+    is the case most likely to be well separated, which is exactly the
+    number this function exists to produce.
+    """
+    g = np.asarray(hist_gen, float)
+    i = np.asarray(hist_imp, float)
+    if g.sum() <= 0 or i.sum() <= 0:
+        return float("nan")
+    far = np.r_[np.cumsum(i[::-1])[::-1], 0.0] / i.sum()
+    frr = np.r_[0.0, np.cumsum(g)] / g.sum()
+    d = far - frr
+    exact = np.flatnonzero(d == 0.0)
+    if len(exact):
+        return float(far[exact[0]])
+    cross = np.flatnonzero((d[:-1] > 0) & (d[1:] < 0))
+    if len(cross):
+        j = int(cross[0])
+        w = d[j] / (d[j] - d[j + 1])
+        return float(far[j] + w * (far[j + 1] - far[j]))
+    j = int(np.argmin(np.maximum(far, frr)))      # never crosses
+    return float((far[j] + frr[j]) / 2.0)
+
+
 def eer_check(genuine, impostor, M):
     """Recompute EER from the histogram, to prove the dump is faithful."""
     g = np.asarray(genuine, float)
@@ -143,8 +248,15 @@ def run_score_dump():
         return json.loads(output.read_text())
 
     result = {"schema": 1, "analysis": "score_histograms",
-              "system": "polyiom, the proposed pipeline, at its sealed "
-                        "operating point",
+              "systems": {
+                  "protected": "polyiom, the sealed pipeline; integer "
+                               "collision scores in 0..M",
+                  "unprotected": "plain cosine between the same embeddings; "
+                                 "binned over [-1,1], the performance-"
+                                 "preservation reference"},
+              "mated_note": "the mated distribution is both the "
+                            "unlinkability mated set and the revocability "
+                            "pseudo-impostor set; one measurement, not two",
               "lossless": "scores are integers in 0..M, so a count per "
                           "score value loses nothing",
               "master_seed": S0, "changes_any_seal": False, "modalities": {}}
@@ -175,8 +287,14 @@ def run_score_dump():
                                         dtype=torch.float32).to(DEVICE))
             h = histograms_for(modality, subjects, enroll, probes, M, q,
                                overlap, key, recognition, pair)
+            h["dlink_curve"], h["dlink_global"] = unlinkability_curve(
+                h["mated"], h["nonmated"])
+            h["unprotected"] = cosine_histograms(subjects, enroll, probes)
             entry["partitions"][partition] = h
             recomputed = eer_check(h["genuine"], h["impostor"], M)
+            raw = eer_cosine(h["unprotected"]["genuine"],
+                             h["unprotected"]["impostor"])
+            h["unprotected"]["EER"] = raw
             note = ""
             if partition == "evaluation":
                 delta = abs(recomputed - sealed["EER_HOLDOUT"])
@@ -186,8 +304,12 @@ def run_score_dump():
                         f"  *** MISMATCH vs sealed "
                         f"{sealed['EER_HOLDOUT'] * 100:.4f}%")
             print(f"  {partition:<12} {h['n_subjects']} identities, "
-                  f"{h['n_genuine']} genuine / {h['n_impostor']} impostor, "
-                  f"EER {recomputed * 100:.4f}%{note}")
+                  f"{h['n_genuine']} genuine / {h['n_impostor']} impostor")
+            print(f"    protected   EER {recomputed * 100:7.4f}%{note}")
+            print(f"    unprotected EER {raw * 100:7.4f}%   "
+                  f"-> protection costs "
+                  f"{(recomputed - raw) * 100:+.4f} pp")
+            print(f"    D_link global {h['dlink_global']:.6f}")
         result["modalities"][modality] = entry
 
     # External voice, if its embeddings are present
@@ -215,10 +337,18 @@ def run_score_dump():
                                         dtype=torch.float32).to(DEVICE))
             h = histograms_for("voice", subjects, enroll, probes, M, q,
                                overlap, key, recognition, pair)
+            h["dlink_curve"], h["dlink_global"] = unlinkability_curve(
+                h["mated"], h["nonmated"])
+            h["unprotected"] = cosine_histograms(subjects, enroll, probes)
+            h["unprotected"]["EER"] = eer_cosine(
+                h["unprotected"]["genuine"], h["unprotected"]["impostor"])
             result["modalities"]["voice"]["partitions"]["external"] = h
             print(f"\n  external     {h['n_subjects']} speakers, "
-                  f"{h['n_genuine']} genuine / {h['n_impostor']} impostor, "
-                  f"EER {eer_check(h['genuine'], h['impostor'], M) * 100:.4f}%")
+                  f"{h['n_genuine']} genuine / {h['n_impostor']} impostor")
+            print(f"    protected   EER "
+                  f"{eer_check(h['genuine'], h['impostor'], M) * 100:7.4f}%")
+            print(f"    unprotected EER "
+                  f"{h['unprotected']['EER'] * 100:7.4f}%")
         except Exception as exc:
             print(f"\n  external: skipped - {type(exc).__name__}: {exc}")
     else:
