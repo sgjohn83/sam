@@ -1,0 +1,11 @@
+{
+  "cfp_metadata_sha256": "dcbcd60c4b60ad7498d5ef2f7d5889b41700feb3ef3a9a93b392b7a38cdc2a9e",
+  "eligible_before_overlap_removal": 900,
+  "excluded_exact_overlap_count": 100,
+  "excluded_sha256": "c978dce9c13d2e49822b5d3d1b0767057395a0e50e029d2c5346793a0c99b44d",
+  "match_rule": "case_sensitive_space_to_underscore_v1",
+  "selected_background": 50,
+  "selected_development": 42,
+  "selected_evaluation": 58,
+  "split_sha256": "79c5aac6d3c19a01db3388f19342a4cef318443693387b347ad958b35f62e8b6"
+}

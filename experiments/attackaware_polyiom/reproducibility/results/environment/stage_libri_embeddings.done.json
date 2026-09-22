@@ -1,0 +1,7 @@
+{
+  "completed_unix": 1788781600.0447152,
+  "embeddings": 2250,
+  "protocol_version": "1.1.1",
+  "sha256": "65d96727c00c8fac0a487cd8e2a7ffa59b20942baebc1a7ada5b6d1f4d9d4751",
+  "stage": "libri_embeddings"
+}

@@ -1,0 +1,10 @@
+{
+  "background": 50,
+  "completed_unix": 1788771438.5137756,
+  "development": 42,
+  "evaluation": 58,
+  "manifest_sha256": "e44365f70ac69aa583a71e25e67dd8b3446e7abba03d14df63da33e52ad742a4",
+  "protocol_version": "1.1.1",
+  "selected_speakers": 150,
+  "stage": "libri_internal"
+}

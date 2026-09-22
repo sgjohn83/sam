@@ -1,0 +1,20 @@
+{
+  "id_order_evidence": "https://github.com/Fizza-Rubab/unmasking-face-embeddings/blob/main/experiments/eval_naming.py",
+  "match_field": "lfw_identifier",
+  "match_rule": "case_sensitive_space_to_underscore_v1",
+  "metadata_filename": "cfp_subject_names.tsv",
+  "metadata_format": "tsv",
+  "metadata_relative_path": "protocol/cfp_authoritative_metadata/cfp_subject_names.tsv",
+  "metadata_sha256": "dcbcd60c4b60ad7498d5ef2f7d5889b41700feb3ef3a9a93b392b7a38cdc2a9e",
+  "provenance_status": "release_metadata_from_mirror_original_host_not_verified",
+  "rows": 500,
+  "scope": "exact_name_overlap_exclusion_not_alias_resolution",
+  "source_distribution": "Kaggle mirror chinafax/cfpw-dataset version 1",
+  "source_readme": "Release README describes 500 names in order; calls the file list_names.txt",
+  "source_release_path": "cfp-dataset/Data/list_name.txt",
+  "source_sha256": "e2ada6d692e05380ba9c643a61672f1d9b56f01aa098edaf45aae082e00f2f5c",
+  "source_url": "https://www.kaggle.com/datasets/chinafax/cfpw-dataset/versions/1",
+  "subject_id_field": "cfp_subject_id",
+  "subject_name_field": "subject_name",
+  "unique_subject_names": 500
+}

@@ -326,13 +326,29 @@ protected templates are compared.
 
 ### 3.2 Frozen encoders
 
-For face we use a FaceNet encoder producing a 512-dimensional embedding
-`[CITE: FaceNet, Schroff et al.]`. For voice we use an ECAPA-TDNN speaker
-encoder producing a 192-dimensional embedding `[CITE: ECAPA-TDNN,
-Desplanques et al.]`. Neither network is fine-tuned at any point. This is
-deliberate. It means the recognition performance we start from is that of
-the published model, and any loss we report is attributable to the
-protection scheme rather than to training choices.
+For face we use the FaceNet architecture `[CITE: FaceNet, Schroff et al.]`
+as released in facenet-pytorch `[CITE: facenet-pytorch, Esler]`:
+Inception-ResNet-v1 pretrained on VGGFace2 `[CITE: VGGFace2, Cao et al.]`,
+producing a 512-dimensional embedding. Faces are detected and aligned with
+MTCNN `[CITE: MTCNN, Zhang et al. 2016]` from the same package, resized to
+160 x 160, prewhitened by the package's convention, and L2-normalised.
+Images in which no face is detected are excluded rather than padded; this
+gate is what reduces the 13,233 images of LFW to the 7,581 valid
+embeddings we start from.
+
+For voice we use ECAPA-TDNN `[CITE: ECAPA-TDNN, Desplanques et al.]` as
+released by SpeechBrain `[CITE: SpeechBrain, Ravanelli et al.]`, trained on
+VoxCeleb `[CITE: VoxCeleb, Nagrani et al.]`, producing a 192-dimensional
+embedding from 16 kHz mono audio. The checkpoint is pinned to a single
+repository revision and its weight files are recorded by hash (Section
+4.6), so a rerun cannot silently pick up a newer release.
+
+Neither network is fine-tuned at any point. This is deliberate. It means
+the recognition performance we start from is that of the published model,
+and any loss we report is attributable to the protection scheme rather
+than to training choices. It also means the face baseline is whatever this
+particular released model achieves on LFW, which Section 5.2 shows is the
+binding constraint on the face arm.
 
 We write the embedding of sample $x_m$ in modality $m$ as
 $z_m = f_m(x_m)$.
@@ -500,6 +516,76 @@ pre-registration, and we label them as secondary wherever they appear. We
 make this distinction explicitly because it is the distinction most often
 blurred in this literature, and because the confirmatory results are more
 trustworthy for being separated from the exploratory ones.
+
+
+### 4.6 Implementation, frameworks and provenance
+
+Everything below is recorded in machine-readable form in the
+reproducibility package (`results/environment/`), copied from the sealed
+project's own stage records rather than reconstructed afterwards. The
+table gives what a reader needs to rebuild the inputs; the hashes are in
+the package.
+
+**Third-party components, used unmodified.**
+
+| Component | What it does here | Version / pin |
+|---|---|---|
+| PyTorch `[CITE: PyTorch, Paszke et al.]` | encoder inference, hashing, the attack's gradients | 2.11.0 |
+| facenet-pytorch `[CITE: facenet-pytorch]` | MTCNN detection and alignment; Inception-ResNet-v1 (VGGFace2) face encoder | 2.6.0 |
+| SpeechBrain `[CITE: SpeechBrain]` | ECAPA-TDNN speaker encoder | 1.1.1; `spkrec-ecapa-voxceleb` at revision `3d2520d6`, both checkpoint files hashed |
+| torchaudio, PyAV | audio decoding for the encoder | 2.11.0; 18.1.0 |
+| soundfile, SciPy `[CITE: SciPy]` | VCTK FLAC decoding; resampling 48 kHz to 16 kHz with `resample_poly` | SciPy for resampling and for the normal-deviate and beta quantiles in the figures |
+| NumPy, pandas `[CITE: NumPy]` | histograms, bootstrap, manifests | 2.1.3; 2.2.3 |
+| matplotlib `[CITE: matplotlib]` | the results figures | Agg backend |
+| TikZ | the two method figures | |
+
+**Corpora.**
+
+| Corpus | Use | What was taken |
+|---|---|---|
+| LFW `[CITE: LFW, Huang et al.]` | face, internal | the original unaligned archive `lfw.tgz`, 13,233 images; 7,581 pass MTCNN; 900 identities have at least three valid images |
+| CFP-W `[CITE: CFP, Sengupta et al.]` | face, exclusion only | its 500 subject names, used to remove 100 LFW identities by exact case-sensitive name match, so that a future external face evaluation on CFP would be subject-disjoint. Exact names only; no alias resolution. The name list came from a public mirror and its original host was not verified |
+| LibriSpeech `[CITE: LibriSpeech, Panayotov et al.]` | voice, internal | `train-clean-100`, archive MD5 recorded; 150 speakers with 15 utterances each, 2,250 embeddings; ranks 0 to 4 form the enrolment mean, 5 to 14 are probes. Validity: decodes to mono 16 kHz, non-empty, finite; no duration gate |
+| VCTK 0.92 `[CITE: VCTK, Yamagishi et al.]` | voice, external | `mic1` only, 110 speakers, first 15 valid utterances per speaker in sorted filename order, 1,650 embeddings, resampled to 16 kHz; validity: at least 24,000 samples after resampling, that is 1.5 s |
+
+From the 900 eligible face identities, and from the 150 selected speakers,
+the partition is 50 background, 42 development, 58 evaluation, drawn once
+from master seed 2026 under protocol version 1.1.1.
+
+**What we implemented ourselves.** The keyed polynomial hardening, IoM-GRP
+hashing and collision matching (Section 3); the identity-cluster paired
+percentile bootstrap and the two-level key-and-identity bootstrap
+(Section 4.3); the global and local unlinkability measures of
+`[CITE: Gomez-Barrero et al.]`; and the annealed-softmax inversion attack
+(Section 5.5), optimised with Adam `[CITE: Adam, Kingma and Ba]`. The
+package ships a NumPy rewrite of the pipeline and a parity check against
+the PyTorch original: one float32 ulp of difference on the hardened
+vector, and zero differing template indices out of 32,768.
+
+**Two attack budgets, kept distinct.** The Stage A key-search gate
+(Section 3.6) rejected candidate keys using 5 restarts of 2,000 Adam
+iterations at learning rate 0.01, with a candidate budget of 10,000
+extended to at most 20,000, and acceptance floors of correlation at most
+0.9 with true accept rate at least 0.95 in stage one, relaxed to 0.85 and
+0.90 in stage two. The full-knowledge attack of Section 5.5 is a separate
+run at 5 restarts of 800 steps, learning rate 0.05, softmax temperature
+annealed from 1.0 to 0.05, applied identically to all three arms. The
+selection gate is not the evaluation, and the paper never uses it as one.
+
+**Configuration grid.** $M \in \{32, 64, 128, 256\}$, $q \in \{4, 8, 16,
+32\}$, $o \in \{0, 1, 2, 3, 4\}$, eighty configurations per modality,
+window length $G = 5$, design target false match rate $10^{-3}$.
+
+**Compute and determinism.** Embeddings were extracted on CPU (Python
+3.13.15, PyTorch 2.11.0+cpu). The sweep, the sealed evaluation and the
+secondary analyses ran on a single Tesla T4 (CUDA 12.8, cuDNN 9.19,
+PyTorch 2.11.0+cu128). Hashing is pinned to CPU in every analysis, with
+`torch.use_deterministic_algorithms(True)` and cuDNN benchmarking off, so
+no reported number depends on which accelerator was allocated. Every
+random draw is seeded from a documented function of the master seed and
+the analysis name. The environment was recorded before and after each
+dependency install, and a torch downgrade during install is reported as a
+failure rather than discovered later.
 
 ---
 

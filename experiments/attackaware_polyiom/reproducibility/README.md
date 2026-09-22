@@ -12,6 +12,8 @@ polyiom/             the pipeline as plain NumPy, runnable anywhere
   demo.py            end to end on synthetic data
   parity.py          checks core.py against the study's PyTorch code
 results/             the stored outputs of each analysis
+  environment/       13 sealed provenance records: encoders, corpora, grid, compute
+ENVIRONMENT.md       frameworks, models, corpora and compute, read from those records
 code/runtime/        the analysis code as the study ran it (*_only.py)
 code/notebooks/      the Colab notebooks that load and run it
 code/figures/        figure builders and the figure explanation text

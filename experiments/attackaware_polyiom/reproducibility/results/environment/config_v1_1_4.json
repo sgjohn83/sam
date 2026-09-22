@@ -1,0 +1,61 @@
+{
+  "protocol_version": "1.1.1",
+  "master_seed": 2026,
+  "internal_split_counts": {
+    "background": 50,
+    "development": 42,
+    "evaluation": 58
+  },
+  "g": 5,
+  "M_grid": [
+    32,
+    64,
+    128,
+    256
+  ],
+  "q_grid": [
+    4,
+    8,
+    16,
+    32
+  ],
+  "overlaps": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "reference": {
+    "M": 128,
+    "q": 16,
+    "o": 2
+  },
+  "target_fmr": 0.001,
+  "candidate_budget": {
+    "stage1": 10000,
+    "maximum": 20000
+  },
+  "stage1": {
+    "rho_max": 0.9,
+    "tar_min": 0.95
+  },
+  "stage2": {
+    "rho_max": 0.85,
+    "tar_min": 0.9
+  },
+  "attack": {
+    "restarts": 5,
+    "iterations": 2000,
+    "lr": 0.01,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "init_std": 0.1
+  },
+  "lfw_cfp_overlap": "exact_case_sensitive_subject_identifier",
+  "librispeech_validity": "decode_mono_16k_nonempty_finite_no_duration_gate",
+  "vctk_validity": "mic1_post_resample_samples>=24000"
+}

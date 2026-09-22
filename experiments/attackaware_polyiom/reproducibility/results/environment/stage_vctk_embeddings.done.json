@@ -1,0 +1,9 @@
+{
+  "checkpoint_interval": 32,
+  "completed_unix": 1789657559.2200065,
+  "manifest_sha256": "3025b1d448e318ccde93c3becab392c15f075b128c260bcd3dbc4c61742a9705",
+  "n": 1650,
+  "protocol_version": "1.1.1",
+  "sha256": "5fd9c3b6e71282bbbe890e2c7dfb01b4de00c7e4acac5ec156995709e495007a",
+  "stage": "vctk_embeddings"
+}

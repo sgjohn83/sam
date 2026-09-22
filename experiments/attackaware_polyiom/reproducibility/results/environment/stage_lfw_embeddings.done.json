@@ -1,0 +1,9 @@
+{
+  "completed_unix": 1788770241.5083568,
+  "embeddings_sha256": "6da5f90d0513173c7ce447c5415f96526175a032b982ef9d03b35d275083deb0",
+  "identities_with_at_least_3_valid": 900,
+  "protocol_version": "1.1.1",
+  "stage": "lfw_embeddings",
+  "valid_embeddings": 7581,
+  "validity_sha256": "b424e215f3a2b928873fb50f1fed621d1964fa580106523b492e5315a3c1cea4"
+}

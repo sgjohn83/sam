@@ -1,0 +1,17 @@
+{
+  "archive_bytes": 11747302977,
+  "completed_unix": 1789654999.6629865,
+  "corpus": "VCTK-Corpus-0.92",
+  "manifest_sha256": "3025b1d448e318ccde93c3becab392c15f075b128c260bcd3dbc4c61742a9705",
+  "mic": "mic1",
+  "n_speakers": 110,
+  "n_speakers_skipped": 0,
+  "n_utterances": 1650,
+  "protocol_version": "1.1.1",
+  "resampler": "scipy.signal.resample_poly",
+  "selection": "first N valid in sorted filename order",
+  "stage": "vctk_manifest",
+  "target_sample_rate": 16000,
+  "utterances_per_speaker": 15,
+  "validity_rule": "mic1_post_resample_samples>=24000"
+}
