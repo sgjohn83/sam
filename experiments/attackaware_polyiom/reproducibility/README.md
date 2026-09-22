@@ -15,9 +15,17 @@ results/             the stored outputs of each analysis
 code/runtime/        the analysis code as the study ran it (*_only.py)
 code/notebooks/      the Colab notebooks that load and run it
 code/figures/        figure builders and the figure explanation text
+tests/               29 unit tests for the pipeline and the metrics
+REVIEWER.md          the five-minute path, and what we would raise ourselves
+RUNBOOK.md           running and verifying, with expected output
+DATA.md              what is not included, why, and the paper's statements
+LICENSE              MIT (author name needs filling in)
+CITATION.cff         how to cite (placeholders need filling in)
 requirements.txt     numpy; torch and matplotlib are optional
 MANIFEST.sha256      hashes of every file here
 ```
+
+**Reviewing this for a journal? Start with `REVIEWER.md`.**
 
 ## Quickest possible start
 

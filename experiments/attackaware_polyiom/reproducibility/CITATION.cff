@@ -1,0 +1,34 @@
+# Fill in the bracketed fields before submission.
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the paper."
+title: "AttackAware PolyIoM v1.1.4 — reproducibility package"
+version: 1.1.4
+date-released: 2026-09-22
+license: MIT
+abstract: >-
+  Code and stored results for a pre-registered evaluation of a cancelable
+  biometric scheme that applies a keyed polynomial transform to a face or
+  speaker embedding before Index-of-Maximum hashing, reporting all four
+  ISO/IEC 24745 criteria at one sealed operating point.
+authors:
+  - family-names: "[FAMILY NAME]"
+    given-names: "[GIVEN NAMES]"
+    orcid: "[https://orcid.org/0000-0000-0000-0000]"
+    affiliation: "[AFFILIATION]"
+keywords:
+  - cancelable biometrics
+  - template protection
+  - index-of-maximum hashing
+  - unlinkability
+  - reproducibility
+preferred-citation:
+  type: article
+  title: >-
+    Keyed compression is what makes an IoM-based cancelable biometric
+    revocable: a pre-registered evaluation on face and voice
+  authors:
+    - family-names: "[FAMILY NAME]"
+      given-names: "[GIVEN NAMES]"
+  year: 2026
+  journal: "[JOURNAL]"
+  doi: "[DOI]"

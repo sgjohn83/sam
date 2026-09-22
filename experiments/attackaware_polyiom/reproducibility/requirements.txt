@@ -1,8 +1,13 @@
-numpy>=1.20
+# Verified on Python 3.11.15 with the versions noted below.
+# `run.py verify` and `run.py test`(metrics only) need nothing beyond these.
 
-# optional, only for `run.py parity`
-# torch
+numpy>=1.20          # tested with 2.4.6
 
-# optional, only for rebuilding the figures
-# matplotlib
-# scipy
+# Optional: only for `run.py parity`, which compares the NumPy pipeline
+# against the study's PyTorch one. Absent, parity reports SKIPPED.
+# torch>=2.0         # tested with 2.14.0+cu130 (CPU is enough)
+
+# Optional: only for rebuilding the four results figures from
+# score_histograms.json.
+# matplotlib>=3.5
+# scipy>=1.7

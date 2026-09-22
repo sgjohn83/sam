@@ -2,9 +2,10 @@
 """AttackAware PolyIoM v1.1.4 — one entry point.
 
     python3 run.py verify     check the paper against results/   (no deps)
+    python3 run.py test       unit tests for pipeline + metrics  (numpy)
     python3 run.py demo       run the pipeline on synthetic data (numpy)
     python3 run.py parity     check NumPy against PyTorch        (torch)
-    python3 run.py all        all three
+    python3 run.py all        all four
 
 Run `verify` first. It needs nothing but Python and tells you whether the
 manuscript matches the stored results.
@@ -37,6 +38,15 @@ def cmd_verify():
     return subprocess.call([sys.executable, str(HERE / "verify.py")])
 
 
+def cmd_test():
+    banner("test — unit tests for the pipeline and the metrics")
+    if not need("numpy", "The tests"):
+        return 1
+    return subprocess.call([sys.executable, "-m", "unittest",
+                            "discover", "-s", "tests", "-t", str(HERE)],
+                           cwd=str(HERE))
+
+
 def cmd_demo():
     banner("demo — the pipeline end to end on synthetic data")
     if not need("numpy", "The demo"):
@@ -57,7 +67,8 @@ def cmd_parity():
     return 0 if ok else 1
 
 
-COMMANDS = {"verify": cmd_verify, "demo": cmd_demo, "parity": cmd_parity}
+COMMANDS = {"verify": cmd_verify, "test": cmd_test,
+            "demo": cmd_demo, "parity": cmd_parity}
 
 
 def main(argv):
@@ -66,7 +77,7 @@ def main(argv):
         return 0 if len(argv) == 2 else 2
     name = argv[1]
     if name == "all":
-        codes = [COMMANDS[c]() for c in ("verify", "parity", "demo")]
+        codes = [COMMANDS[c]() for c in ("verify", "test", "parity", "demo")]
         banner("done")
         print("all steps exited cleanly" if not any(codes)
               else f"a step failed: exit codes {codes}")
