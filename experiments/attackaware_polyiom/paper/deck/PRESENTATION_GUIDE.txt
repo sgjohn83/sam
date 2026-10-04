@@ -1,0 +1,351 @@
+Presentation Guide: AttackAware PolyIoM
+A simple guide to the 24 slides
+
+
+THE MAIN IDEA IN ONE MINUTE
+===========================
+
+Face and voice systems store a coded version of your face or voice. We call this
+a template.
+
+If a password is stolen, you change it. You cannot change your face or voice. So
+the template is locked with a secret key. If the template is stolen, we change
+the key, and the stolen copy should stop working. This is called cancelling (or
+revoking) the template.
+
+Our system locks the template in two steps:
+
+  - Step 1: a secret maths formula (a polynomial) scrambles the face or voice
+    data and makes it smaller.
+  - Step 2: a second secret key turns the result into a short list of numbers
+    (IoM hashing).
+
+Our main findings:
+
+  - Making the data smaller with a secret key (Step 1) is what allows a stolen
+    template to be cancelled.
+  - The polynomial also hides the real face or voice from an attacker.
+  - This hiding costs a little accuracy. So there is a trade-off.
+
+
+WORDS USED IN THE SLIDES
+========================
+
+  - Template: the coded version of a face or voice that the system keeps.
+  - Key: a secret code, like a password, used to lock the template.
+  - Error rate (EER): how often the system makes a mistake. Lower is better.
+  - pp (percentage points): the gap between two percentages. From 1% to 3% is a
+    gap of 2 pp.
+  - Linkability (Dsys): can someone tell that two locked templates belong to the
+    same person? 0 means no, 1 means yes.
+  - Similarity score (cosine): how close the attacker's copy is to the real face
+    or voice. 0 means nothing alike, 1 means the same.
+  - Firm result: a result we are confident about, not a matter of luck.
+
+
+PART 1: THE QUESTION
+====================
+
+Slide 1: Title
+--------------
+
+The title gives the main finding: locking and shrinking the data with a secret
+key is what makes a stolen template cancellable. We fixed all the test rules
+before looking at the test data.
+
+Say: This talk is about keeping face and voice data safe, and about which step
+lets us cancel a stolen copy.
+
+
+Slide 2: Abstract
+-----------------
+
+The whole paper in four points. One: what the system is. Two: it recognises
+voices well, making mistakes only about 2% of the time on people it has never
+seen. Three: the protection costs about 2 points of accuracy, but an attacker
+cannot rebuild the real voice. Four: without the secret shrinking step, a stolen
+template can never be cancelled.
+
+Say: The system works, it hides the real biometric, and it can be cancelled.
+Each of these has a small, measured cost.
+
+
+Slide 3: The problem
+--------------------
+
+A protected template must pass four tests. It must still recognise people. A
+thief must not be able to rebuild the face or voice from it. Two copies made
+with different keys must not be linkable. And after a theft, a new key must make
+the old copy useless. Most studies skip the last test. We do it.
+
+Say: Most studies check three of the four tests. We also check the fourth: can a
+stolen template really be cancelled?
+
+
+Slide 4: The system and our three questions
+-------------------------------------------
+
+The data goes through four steps: face or voice data, secret polynomial, second
+secret key, stored template. We ask three questions. Can the simplest version
+(without Step 1) be cancelled? No, never. What makes cancelling work? Shrinking
+the data with a secret key. What does the polynomial add? It hides the real
+voice much better, but costs a little accuracy.
+
+Say: Cancelling works because of the secret shrinking step. The polynomial adds
+extra hiding.
+
+
+Slide 5: What this paper adds
+-----------------------------
+
+We tested the system more fairly than usual. We removed one part at a time to
+see what each part does. We attacked every version in the same way. We tested
+cancelling. We compared everything with an unprotected system.
+
+Say: Our main contribution is a fairer way to test systems like this one.
+
+
+Slide 6: Background
+-------------------
+
+Other studies often choose their settings using the same data they test on. They
+rarely test each part separately. And they claim the data is safe without
+actually attacking it. We avoid all three problems.
+
+Say: We test the things other studies usually take for granted.
+
+
+PART 2: HOW WE DID IT
+=====================
+
+Slide 7: The face and voice models
+----------------------------------
+
+We used two well-known, ready-made models: FaceNet for faces and ECAPA for
+voices. They turn a photo or voice clip into a list of numbers. We did not
+change or retrain them, so any difference we see comes from our protection.
+
+Say: We used standard models without changes, so the results show the effect of
+the protection only.
+
+
+Slide 8: How a template is made and checked
+-------------------------------------------
+
+First, the secret polynomial shrinks the voice data from 192 numbers to 48.
+Next, a second key turns these into a short list of positions, such as 3, 1, 4.
+To check a person, the system counts how many positions match. Enough matches
+means the person is accepted.
+
+Say: The stored template is just a list of positions. Checking a person means
+counting how many positions match.
+
+
+Slide 9: Choosing the key and the settings
+------------------------------------------
+
+We tried thousands of keys on one group of 50 people and kept the best. Then we
+tried 80 settings on another group of 42 people and kept the best. Both were
+then locked so they could not be changed.
+
+Say: All choices were made on separate people, then locked before testing.
+
+
+Slide 10: Splitting the people into groups
+------------------------------------------
+
+People were split into four separate groups: 50 for choosing the key, 42 for
+choosing the settings, 58 for the main test, and 110 from a different voice
+dataset for a final check. The test groups were not used until everything was
+locked.
+
+Say: No one in the test groups was seen while we were building the system. This
+keeps the results honest.
+
+
+Slide 11: How we measured
+-------------------------
+
+We measured five things: how often the system makes mistakes, how often it
+accepts the right person, how linkable the templates are, how often an attacker
+gets in, and how often a stolen template still works after the key is changed.
+We repeated each calculation 2,000 times on reshuffled data to see how certain
+each result is.
+
+Say: We only call a result firm when the reshuffling shows it is not due to
+luck.
+
+
+Slide 12: Tools and data
+------------------------
+
+This slide lists every software tool and dataset, with exact versions. Anyone
+can repeat the work and get the same numbers.
+
+Say: Everything is recorded, so the study can be repeated exactly.
+
+
+PART 3: RESULTS
+===============
+
+Slide 13: The locked settings
+-----------------------------
+
+For voice, the system met its target easily. For face, no setting reached the
+voice target, because the face model itself already makes about 3.5% mistakes.
+So we set an easier face target. We did this before seeing any test data.
+
+Say: We set an easier target for face, openly and before testing, because the
+face model alone could not reach the harder one.
+
+
+Slide 14: Testing on new people
+-------------------------------
+
+On 58 new speakers, the system made mistakes 1.93% of the time. Protection made
+voice accuracy about 2 points worse, and we are confident about this cost. For
+face, the data was not enough to measure the cost clearly.
+
+Say: Protection costs about 2 points of accuracy on voice. On face, we cannot
+tell yet.
+
+
+Slide 15: Testing on a different voice dataset
+----------------------------------------------
+
+We took the locked system and tested it, unchanged, on 110 speakers from a
+different dataset. It made mistakes 2.80% of the time, with no clear drop in
+quality. One target was missed: it wrongly accepted strangers 0.377% of the
+time, against a goal of 0.1%.
+
+Say: On completely new data, the system still worked well. We report the one
+target it missed.
+
+
+Slide 16: What the polynomial costs
+-----------------------------------
+
+We compared three versions: with the polynomial, with a simpler secret step
+instead (a linear map), and with neither. The polynomial causes most of the
+accuracy loss, about 1.2 points on voice.
+
+Say: The polynomial is the main cost. The next slide shows what we get for it.
+
+
+Slide 17: What an attacker can and cannot do
+--------------------------------------------
+
+We imagined the strongest attacker, who knows all the keys. This attacker can
+always create a fake input that the system accepts, for every version. But with
+the polynomial, the attacker's copy looks very little like the real voice: a
+similarity score of 0.222, compared with 0.490 for the simpler version and 0.913
+with no polynomial.
+
+Say: The attacker can trick the system, but cannot recover the real face or
+voice. That is why cancelling is important.
+
+
+Slide 18: Can a stolen template be cancelled?
+---------------------------------------------
+
+We changed the keys 80 times. Without the shrinking step, the stolen template
+still worked every time (80 out of 80): cancelling failed. With the polynomial,
+it usually stopped working, but in 12 of the 80 cases many stolen copies still
+worked, and we do not yet know why. With the simpler linear step, cancelling
+worked every time. An earlier, smaller test had suggested the polynomial was
+clearly worse here. With more keys, that difference disappeared, so we withdrew
+that claim.
+
+Say: Without the secret shrinking step, cancelling never works. With it,
+cancelling works in most cases.
+
+
+Slide 19: Summary of results
+----------------------------
+
+One table shows all four tests and how strong the evidence is for each. The
+bottom line: the shrinking step makes cancelling work, the polynomial hides the
+real biometric, and choosing between the polynomial and the simpler step is a
+trade-off.
+
+Say: Here are all the results in one place.
+
+
+PART 4: WHAT IT MEANS
+=====================
+
+Slide 20: Discussion
+--------------------
+
+First, the polynomial hides the real face or voice, but it does not stop a fake
+input from being accepted. Second, cancelling is the test that best shows the
+difference between designs. Third, other studies should attack simple versions
+too, test each part separately, and try many keys.
+
+Say: The most important test is the one most studies skip: cancelling.
+
+
+Slide 21: Which design to choose
+--------------------------------
+
+The polynomial hides the real face or voice better, but it is a little less
+accurate and cancelling sometimes fails. The simpler linear step is more
+accurate and cancelling always works, but it hides less. Choose the polynomial
+if losing the real face or voice is the biggest worry. Choose the simpler step
+if accuracy matters most. Always include a secret shrinking step.
+
+Say: Neither choice is best in every way. Pick based on what you need to protect
+most.
+
+
+Slide 22: Limitations
+---------------------
+
+The study has limits. The test groups are small. Face was not tested on a second
+dataset. Only one kind of attack was tried. We do not yet know why some keys
+fail to cancel. The face model itself limits how accurate face can be.
+
+Say: These limits tell us how far to trust the results. None of them changes the
+main findings.
+
+
+Slide 23: Conclusion
+--------------------
+
+The secret shrinking step makes cancelling possible. The polynomial hides the
+real face or voice. Choosing between them is a trade-off. Anyone can check every
+number in this study with one command.
+
+Say: Shrink the data with a secret key so templates can be cancelled. Add the
+polynomial if hiding the real biometric is worth a small loss in accuracy.
+
+
+Slide 24: Declarations
+----------------------
+
+An AI assistant helped with some code, the figures and the writing. The main
+design and results came first. Our code and results are shared. Only public data
+was used, and we attacked only our own templates.
+
+Say: We are open about how AI was used and what we share.
+
+
+THREE THINGS TO REMEMBER
+========================
+
+  - The secret shrinking step is what makes a stolen template cancellable.
+  - The polynomial hides the real face or voice from attackers.
+  - This hiding costs a little accuracy, so it is a trade-off.
+
+
+QUESTIONS PEOPLE MAY ASK
+========================
+
+Why not just use the simpler linear step? Because it hides less of the real face
+or voice, and a stolen face or voice can never be replaced.
+
+Were the results tuned to look good? No. All settings were chosen on separate
+people and locked before testing.
+
+Can others repeat this? Yes. Everything is recorded, and one command re-checks
+every number.
