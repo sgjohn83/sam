@@ -1,639 +1,748 @@
 Presentation Guide: AttackAware PolyIoM
-A slide-by-slide guide to the 24 slides, with the actual numbers explained
+The core ideas behind each of the 24 slides, explained simply
 
-THE STORY IN ONE MINUTE
-=======================
 
-A face or voice system does not keep your photo or recording. It turns it into a
-list of numbers called an embedding (512 numbers for a face, 192 for a voice)
-and stores that. If a hacker steals this list, they hold a copy of your face or
-voice that you can never change.
+HOW TO USE THIS GUIDE
+=====================
 
-The fix is to store a locked version of the list, made with a secret key. If it
-is stolen, the company issues a new key, makes a new locked version, and the
-stolen one should stop working. This is like cancelling a stolen bank card and
-getting a new one with a new number.
+This guide does not repeat what is written on the slides. For each slide it
+explains the idea underneath: what the concept is, how it works, and why it
+matters. Read it once before presenting, so that you can explain any slide in
+your own words and answer questions about it.
 
-Our system locks the data in two steps:
-- Step 1, the polynomial: a secret formula mixes small groups of 5 neighbouring
-  numbers together and shrinks the voice list from 192 numbers to 48.
-- Step 2, IoM hashing: a second secret key creates many random combinations of
-  those 48 numbers, sorts them into groups of 32, and in each group keeps only
-  the position of the biggest one (a number from 1 to 32). For voice there are
-  128 groups, so the stored template is just 128 small numbers, for example 7,
-  31, 2, 19 and so on.
-
-Our three main findings:
-- Step 1 is what makes cancelling work. Without it, a stolen template kept
-  working after the key was changed in all 80 out of 80 tests.
-- The polynomial hides the real voice: an attacker who steals the template can
-  rebuild only a rough, mostly wrong copy of the original voice numbers.
-- That hiding costs some accuracy: about 1.2 extra mistakes per 100 checks on
-  voice. So there is a trade-off.
-
-WORDS USED IN THE SLIDES
-========================
-
-- Embedding: the list of numbers a model makes from a face photo or a voice
-  clip.
-- Template: the locked version of the embedding that the system stores.
-- Genuine attempt: a person trying to log in as themselves. Impostor attempt:
-  someone trying to log in as another person.
-- EER (equal error rate): the error rate when the system is set so that it
-  wrongly rejects real users exactly as often as it wrongly accepts impostors.
-  1.93% means about 2 mistakes in every 100 attempts. Lower is better.
-- TAR (true accept rate): out of 100 genuine attempts, how many are accepted.
-  Higher is better.
-- FMR (false match rate): out of all impostor attempts, how many are wrongly
-  accepted. 0.1% means 1 in 1,000. Lower is better.
-- pp (percentage points): the plain gap between two percentages. From 0.273% to
-  1.928% is a gap of 1.655 pp.
-- Dsys (linkability): if someone has two locked templates made with different
-  keys, can they tell whether both belong to the same person? 0 means they
-  cannot tell at all; 1 means they always can. Lower is better.
-- Cosine (similarity score): how close the attacker's rebuilt copy is to the
-  real embedding. 1 means identical, 0 means unrelated. For comparison, a random
-  guess scores 0.120 on voice.
-- Interval, for example 1.93% [1.09, 2.92]: the true value is very likely
-  somewhere between 1.09% and 2.92%. We get it by reshuffling the people 2,000
-  times and recalculating.
-- Firm: we say a difference is firm when its whole interval is on one side of
-  zero, so it cannot be explained by luck.
 
 PART 1: THE QUESTION
 ====================
 
+
 Slide 1: Title
 --------------
 
-ON THE SLIDE: The title "Keyed compression is what makes an IoM-based cancelable
-biometric revocable", the line "A pre-registered evaluation on face and voice",
-and a diagram showing how a template is built.
+Core idea: a protection scheme is only useful if a stolen template can be
+cancelled, and this paper finds which part of the scheme makes cancelling
+possible.
 
-WHAT IT MEANS: "Keyed compression" is Step 1: shrinking the data with a secret
-key. "Revocable" means a stolen template can be cancelled. "Pre-registered"
-means we wrote down our test plan and our pass marks before we looked at the
-test data, so we could not adjust the plan afterwards to make the results look
-better.
+Cancelable biometrics. A password leak is a nuisance: you choose a new password.
+A face or voice leak is permanent, because you have only one face and one voice.
+Cancelable biometrics solve this by never storing the real biometric. Instead,
+the system stores a version transformed by a secret key. If that version leaks,
+the system picks a new key and builds a new version from the same face. The two
+versions look unrelated, so the leaked one becomes worthless. It works like a
+bank card: the card number can be cancelled and reissued, while your bank
+account stays the same.
 
-SAY: This talk is about keeping stored face and voice data safe, and about which
-part of the protection lets us cancel a stolen copy.
+Keyed compression. "Compression" means turning a long list of numbers into a
+shorter one. "Keyed" means the way it is shortened depends on a secret key. The
+title claims that this step, and not the hashing that follows it, is what makes
+cancelling work. Slide 4 explains why.
+
+Pre-registration. Researchers can fool themselves without meaning to. If you try
+many settings and then report the one that looks best, the result looks better
+than it truly is. Pre-registration prevents this. You write down the plan, the
+settings and the pass marks before you look at the test data, and you stick to
+them. It is like a teacher fixing the pass mark before marking the exams, rather
+than after seeing the scores.
+
+In one line: the paper asks which part of the protection actually lets us cancel
+a stolen template, and tests it with rules fixed in advance.
+
 
 Slide 2: Abstract
 -----------------
 
-ON THE SLIDE: Four cards numbered 01 to 04.
+Core idea: a protection scheme must be judged on all its requirements at the
+same time, at one fixed setting.
 
-WHAT IT MEANS:
-- Card 01 describes the system: Step 1 (polynomial) then Step 2 (IoM hashing).
-- Card 02: on 58 speakers the system had never seen, the voice error rate is
-  1.93%, about 2 mistakes per 100 attempts. On 110 speakers from a completely
-  different recording collection it is 2.80%. Linkability is 0.088 and 0.080,
-  close to the ideal value of 0.
-- Card 03: protection makes voice accuracy worse by 1.84 pp on the new speakers
-  and by 2.79 pp on the different collection. An attacker who knows every secret
-  rebuilds a voice copy with similarity 0.222. Without the polynomial the copy
-  reaches 0.913, which is almost identical to the real voice.
-- Card 04: if Step 1 is removed, a stolen template keeps working after a key
-  change in all 80 tests.
+Why one setting matters. Every biometric system has a dial, the decision
+threshold, that sets how strict it is. Turn it up and strangers are rarely
+accepted, but real users are often rejected. Turn it down and the opposite
+happens. Each requirement can be made to look good at some position of the dial.
+Hashing can also be made more or less detailed. A fair evaluation picks one
+position, locks it, and reports every requirement there. That is what "one
+sealed operating point" means.
 
-SAY: The system recognises people well, keeps templates unlinkable, hides the
-real voice, and can be cancelled. Each of these has a measured cost, and we
-report it.
+The trade-off. The abstract ends with the paper's main message: there is no free
+lunch. The polynomial gives one benefit (it hides the real biometric) and costs
+something in return (accuracy, and less even cancelling). A good paper states
+this openly instead of claiming the method is better at everything.
+
+In one line: the system meets all four requirements at one locked setting, and
+each benefit has a measured cost.
+
 
 Slide 3: The problem
 --------------------
 
-ON THE SLIDE: "Passwords can be changed. Biometrics cannot." and four numbered
-requirements from the international standard ISO/IEC 24745.
+Core idea: the international standard ISO/IEC 24745 asks four things of a
+protected template, and each one protects against a different harm.
 
-WHAT IT MEANS: A locked template must pass four tests:
-- 01 Recognition: it must still recognise the right person nearly as well as an
-  unlocked system.
-- 02 Irreversibility: a thief must not be able to turn the template back into
-  the face or voice.
-- 03 Unlinkability: two templates of the same person made with different keys,
-  for example by a bank and by a hospital, must not be matchable to each other.
-- 04 Revocability: after a theft, a new key must make the stolen template
-  useless.
-Tests 01 to 03 can be done on one template at one moment. Test 04 needs a story
-in two parts: steal a template, change the key, then try the stolen template
-again. That is why most studies skip it. We do it.
+Recognition performance protects usefulness. Protection always throws some
+information away, and less information means more recognition mistakes. A scheme
+that is secure but cannot recognise people is useless.
 
-SAY: Most studies check three of the four requirements. We also check the
-fourth: does cancelling actually work?
+Irreversibility protects the biometric itself. If a thief can turn a stolen
+template back into a face or voice, they could use it to impersonate the person
+on other systems, or simply learn what the person looks or sounds like.
 
-Slide 4: The system and our three questions
+Unlinkability protects privacy. Suppose a bank and a hospital both store your
+protected face with different keys. If someone can tell that the two templates
+belong to the same person, they can track you across services. Unlinkability
+means they cannot.
+
+Revocability protects the future. After a leak, the system must be able to issue
+a new template and make the old one useless.
+
+Why the fourth is rarely tested. The first three can be measured on templates as
+they are, at one moment. Revocability is a story with several steps: steal a
+template, attack it, change the key, then try the attack again. Because it needs
+this sequence, many studies assume it holds instead of testing it.
+
+In one line: four requirements, four different harms, and the one about
+cancelling is the one most often left untested.
+
+
+Slide 4: The scheme and the three questions
 -------------------------------------------
 
-ON THE SLIDE: Four coloured boxes in a row (Embedding, Keyed polynomial, IoM-GRP
-under key R, Template) and three numbered questions with answers.
+Core idea: what an attacker can recover from a stolen template decides whether
+changing the key helps.
 
-WHAT IT MEANS:
-- Question 01: if we use only Step 2 (IoM hashing) on the raw voice numbers, can
-  a stolen template be cancelled? No. An attacker can rebuild the real voice
-  numbers almost exactly (similarity 0.913). Those numbers are the person's real
-  voice, and the real voice does not change when the key changes. So the rebuilt
-  copy is accepted under every new key: 80 out of 80 tests.
-- Question 02: what fixes this? Adding Step 1. Now the attacker can only rebuild
-  the shrunk, key-mixed version, which is tied to the old key. When the key
-  changes, that copy no longer fits. A simple key-based shrinking (a linear map)
-  works too.
-- Question 03: so what does the polynomial add, compared with the simple linear
-  map? Better hiding: the attacker's copy scores 0.222 with the polynomial and
-  0.490 with the linear map. The cost is 1.23 pp more voice errors.
+The embedding. A face or voice model turns a photo or recording into a list of
+numbers called an embedding. You can picture it as a point in space. Recordings
+of the same person land close together, and different people land far apart. The
+system decides "same person" by measuring how close two points are.
 
-SAY: Cancelling works because of the secret shrinking step. The polynomial adds
-extra hiding of the real voice, and that hiding has a price.
+Why hashing alone cannot be cancelled. IoM hashing compares many random
+combinations of the embedding and records which one is largest in each group.
+Each record is a small clue about the direction of the embedding. With hundreds
+of clues, an attacker can work backwards and rebuild the embedding itself almost
+exactly. That embedding is the person's real voice, and it does not depend on
+any key. So after the key changes, the attacker simply runs the new system on
+the rebuilt voice and gets in again. Changing the key is like changing the lock
+on a door when the thief has a copy of your actual fingerprint: the fingerprint
+still opens the new lock.
 
-Slide 5: Contributions and summary of findings
-----------------------------------------------
+Why adding keyed compression fixes it. If the embedding is first shrunk and
+mixed by a secret key, the stored template only describes this mixed version.
+The attacker can now rebuild only the mixed version, which belongs to the old
+key. When the key changes, the mixing changes too, and the attacker's rebuilt
+version no longer fits. Now the thief has a copy of an old key-shaped
+impression, not of your fingerprint, and changing the lock helps.
 
-ON THE SLIDE: Six numbered contributions on the left, and four big numbers on
-the right: 1.93%, 0.088, 0.222 and 80/80.
+What the polynomial adds. Both a simple linear mixing and the polynomial give
+this cancelling benefit. The polynomial adds something more: it is harder to
+work backwards through, so the attacker learns less about the real voice. This
+costs some accuracy.
 
-WHAT IT MEANS: The six contributions are the extra tests we added:
-- We removed one step at a time to see what each step does. This is called an
-  ablation.
-- We ran the same strong attack on every version.
-- We tested whether a stolen template stops working after a key change.
-- We compared every result with the same system without any protection.
-- We explained why each step behaves as it does.
-- We followed a test plan fixed in advance.
-The four numbers are the headline results: 1.93% voice errors, 0.088
-linkability, 0.222 attacker similarity, and 80 out of 80 failures to cancel
-without Step 1.
+In one line: cancelling works only if the attacker cannot recover the real
+biometric; keyed compression makes sure of that, and the polynomial hides it
+even better.
 
-SAY: Our contribution is not only a system. It is a stricter way of testing
-systems like it.
+
+Slide 5: Contributions
+----------------------
+
+Core idea: the main contribution is a fairer way of testing, not only a new
+scheme.
+
+Ablation. To find out what each part of a recipe does, you cook it again with
+one ingredient left out and taste the difference. An ablation does the same with
+a system: remove one step, keep everything else the same, and measure what
+changes. Without it, a multi-step system gets credit for its whole design, even
+if one step does all the work.
+
+Attacking the baselines. If you attack only your own method, you cannot tell
+whether a result comes from your method or would happen to any method. Attacking
+the simple versions with the same attack gives a fair comparison.
+
+Reporting against the unprotected system. The honest question is how much
+protection costs. That can only be answered by comparing with the same system
+without protection, on the same people.
+
+Confirmatory versus exploratory. Results planned in advance and run once are
+confirmatory, which is strong evidence. Analyses added later, after seeing some
+data, are exploratory or secondary, which is supporting evidence. Keeping the
+two apart tells the reader how much weight each result can carry.
+
+In one line: we test each part separately, attack everything equally, and say
+clearly which results were planned and which were added later.
+
 
 Slide 6: Background
 -------------------
 
-ON THE SLIDE: Three cards (2.1, 2.2, 2.3) and a box called "The gap" (2.4).
+Core idea: earlier methods and earlier ways of testing them both have known weak
+spots.
 
-WHAT IT MEANS:
-- 2.1: Older methods such as BioHashing lock data with a random projection. If
-  the key is stolen as well, the projection can be undone and the real data
-  recovered.
-- 2.2: IoM hashing stores only "which one was biggest" in each group, never the
-  values themselves, so a lot of information is thrown away on purpose.
-- 2.3: Many studies have three weak spots. They choose the pass mark using the
-  same people they report results on. They test the full system but never each
-  step on its own. They say "the data cannot be recovered" without actually
-  trying to recover it.
-- 2.4: Our study avoids all three, and adds the cancelling test.
+Random projection and BioHashing. An early idea was to multiply the embedding by
+a secret random matrix, which is a linear transformation. This is easy and keeps
+recognition good. But a linear transformation can be undone by solving
+equations. If the key leaks along with the template, much of the original can be
+recovered.
 
-SAY: We test the things other studies usually take for granted.
+IoM hashing. Index-of-Maximum hashing keeps only the position of the winner in
+each group, not the values. Many different inputs give the same output, so the
+output does not directly reveal the input. That is its strength. As Slide 4
+shows, though, many clues together can still reveal a lot.
+
+Three habits that weaken many studies:
+- Choosing the threshold on the test data. This gives an over-optimistic result,
+  like setting the pass mark after seeing the scores.
+- No ablation. A two-step method is tested as a whole, so nobody knows which
+  step matters.
+- Irreversibility claimed, not tested. The paper argues the template cannot be
+  reversed instead of trying to reverse it with a real attack.
+
+In one line: we avoid the three common habits and add the missing cancelling
+test.
+
 
 PART 2: HOW WE DID IT
 =====================
 
+
 Slide 7: The face and voice models
 ----------------------------------
 
-ON THE SLIDE: Two coloured columns, Face (blue) and Voice (green), each with
-four rows: architecture, weights, front end, output.
+Core idea: freeze the recognition models so that every change in results comes
+from the protection alone.
 
-WHAT IT MEANS:
-- Face: the FaceNet model, trained by others on a large face collection
-  (VGGFace2). A face detector (MTCNN) first finds and crops the face to 160 by
-  160 pixels. Photos with no detectable face are left out. Output: 512 numbers.
-- Voice: the ECAPA-TDNN model from the SpeechBrain toolkit, trained by others on
-  VoxCeleb. Audio is used at 16,000 samples per second. Output: 192 numbers.
-- "Frozen" means we used both models exactly as downloaded, with no retraining.
-  So if results get better or worse, it is because of our protection, not
-  because we changed the model.
+Pretrained models as feature extractors. Building a good face or voice model
+needs millions of examples. Instead, we use models others have already trained,
+FaceNet for faces and ECAPA-TDNN for voices. They turn input into an embedding,
+the list of numbers that captures who the person is.
 
-SAY: We used standard, ready-made models without changes, so the results show
-the effect of our protection only.
+Why frozen. "Frozen" means the models are used exactly as downloaded and never
+retrained on our data. If we retrained them, an improvement could come from the
+better model rather than the protection. Freezing isolates the one thing we want
+to study. It also stops the model from accidentally learning from the test
+people.
+
+Normalisation. Each embedding is scaled to the same length. Only its direction
+matters, so two embeddings are compared by the angle between them. This angle-
+based measure is called cosine similarity: 1 means pointing the same way, 0
+means unrelated.
+
+In one line: we used standard models unchanged so that the experiment measures
+only the protection.
+
 
 Slide 8: How a template is made and checked
 -------------------------------------------
 
-ON THE SLIDE: Two diagrams. The top one shows a template being built; the bottom
-one shows two templates being compared.
+Core idea: each step throws away information on purpose, which protects the
+person but costs some accuracy.
 
-WHAT IT MEANS, for voice:
-- 3.3 Hardening (Step 1): the secret polynomial takes 5 neighbouring numbers at
-  a time, mixes them into 1, then slides along. 192 numbers become 48.
-- 3.4 IoM-GRP (Step 2): a second key makes 128 groups of 32 random combinations
-  of the 48 numbers. In each group only the position of the largest is kept. The
-  template is 128 positions, each between 1 and 32.
-- 3.5 Matching: when the person logs in again, a new template is made the same
-  way and the two are compared group by group. The score is the number of groups
-  where the positions agree. For voice, if 37 or more of the 128 agree, the
-  person is accepted. For face the pass mark is 68 out of 256.
+Hardening with overlapping windows. The polynomial looks at a few neighbouring
+numbers at a time, mixes them into one, then slides along with some overlap. The
+overlap means each number influences more than one output, so no single output
+depends on just one input. Shrinking 192 numbers to 48 loses information. That
+loss is part of the protection, because many different voices now produce the
+same 48 numbers.
 
-SAY: The stored template is just a list of positions. Logging in means counting
-how many positions match, and passing if enough do.
+Non-linear mixing. A polynomial uses squares and other powers, not only
+multiplication by fixed numbers. Linear mixing is like a recipe you can reverse
+with equations. Non-linear mixing is more like baking: many different ingredient
+amounts can give a cake that looks the same, so you cannot read the exact recipe
+back from the cake.
+
+Index-of-Maximum hashing. For each group, the system creates several random
+combinations and records only which one won. Small noise rarely changes the
+winner, so two recordings of the same person tend to give the same positions.
+The actual values are never stored.
+
+Matching by counting agreement. To check a person, the system counts how many
+group winners agree between the stored template and the new one. If enough
+agree, the person is accepted. The threshold is the trade-off dial from Slide 2.
+
+In one line: mix, shrink, keep only the winners, then count matching winners;
+each step hides information and costs a little accuracy.
+
 
 Slide 9: Choosing the key and the settings
 ------------------------------------------
 
-ON THE SLIDE: Two cards, Stage A and Stage B, and a warning note at the bottom.
+Core idea: choosing and testing must use different data, and choosing a key is
+not the same as proving it is safe.
 
-WHAT IT MEANS:
-- Stage A, choosing the secret polynomial key: we generated 10,000 to 20,000
-  candidate keys. Each was tried on a separate group of 50 people. A quick
-  attack test (5 tries of 2,000 steps each) checked how hard each key was to
-  reverse. Keys that harmed recognition were thrown out. The best remaining key
-  was locked in and named K*.
-- Stage B, choosing the settings: we tried 80 combinations of group count, group
-  size and window overlap on a different group of 42 people. A combination
-  passed if it had at most 1% errors and accepted at least 95% of genuine
-  attempts. Among those that passed, we chose the one with the lowest
-  linkability. The pass mark (37 for voice) was fixed at the same time.
-- The warning note: the quick attack test in Stage A was only used to pick a
-  key. It does not prove the final system resists attacks. That proof is on
-  Slide 17.
+Selecting on separate data. When you try many options and keep the best one,
+part of its good score is luck. If you then report that same score, you
+overstate how good it is. This is sometimes called the winner's curse. The cure
+is to choose on one group of people and measure on another group the choice has
+never seen.
 
-SAY: Every choice was made on its own group of people and locked before the test
-data were opened.
+Two-stage selection. Stage A chooses the secret polynomial key. Stage B chooses
+how detailed the hashing is: how many groups, how many options per group, and
+how much the windows overlap. Each stage uses its own group of people, so
+neither choice is tuned to the final test.
+
+The selection rule. Among settings that recognise people well enough, pick the
+one that is hardest to link. This puts privacy first, as long as accuracy stays
+above a minimum.
+
+Selection is not evaluation. Stage A used a quick attack to screen keys. Passing
+a screening test is not proof of safety, in the same way a job interview is not
+proof of good work. The real attack test comes later, on Slide 17.
+
+In one line: choose on one group, test on another, and do not mistake a
+screening test for real proof.
+
 
 Slide 10: Splitting the people into groups
 ------------------------------------------
 
-ON THE SLIDE: A diagram and four large numbers: 50, 42, 58 and 110.
+Core idea: the test must use people the system has never seen, and decisions
+must be locked before testing.
 
-WHAT IT MEANS: The people were split once, by a computer with a fixed random
-seed (2026), into separate groups that never overlap:
-- 50 people: used only to choose the key (Stage A).
-- 42 people: used only to choose the settings (Stage B).
-- 58 people: the main test. Their data was opened only after the key, settings
-  and pass mark were locked.
-- 110 speakers from a different recording collection (VCTK): opened last, as a
-  final outside check.
-"Sealing" means the key, settings and pass mark were saved in a locked record,
-and every later analysis checks that it did not change them.
+Identity-disjoint splits. The groups are split by person, not by photo or
+recording. If the same person appeared in both the tuning and the test groups,
+the system would partly be recognising someone it already knew. Splitting by
+person tests what really matters: how the system handles new users.
 
-SAY: No one in the test groups was seen while we were building the system. This
-is what makes the results trustworthy.
+External validation. Testing on a completely different recording collection
+checks whether the system still works under different conditions: different
+microphones, accents and rooms. A method that works on only one collection may
+have adapted to that collection's quirks.
+
+Sealing. Sealing means writing the key, settings and threshold into a locked
+record before the test data are opened, with checks that nothing changed
+afterwards. It turns "we did not change anything" from a promise into something
+that can be verified.
+
+In one line: new people for testing, a second collection for a reality check,
+and locked decisions so no one can tune after seeing the results.
+
 
 Slide 11: How we measured
 -------------------------
 
-ON THE SLIDE: Six measures (EER, TAR and FMR, Dsys, SAR, PRAR, Firm) and a box
-explaining the intervals.
+Core idea: each measure answers a different question, and every result comes
+with an honest range of uncertainty.
 
-WHAT IT MEANS:
-- EER, TAR, FMR and Dsys: see the word list at the start.
-- SAR (attack success rate): out of all stolen templates, how many did the
-  attacker turn into a fake input that the system accepted?
-- PRAR (post-revocation acceptance rate): after the key is changed, how many of
-  the attacker's fake inputs are still accepted? 0% means cancelling worked
-  perfectly. 100% means it did not work at all.
-- Intervals: we reshuffle the people 2,000 times and recalculate each result.
-  The middle 95% of the results gives the interval. For the cancelling test we
-  also reshuffle the keys, because some keys behave very differently from
-  others.
+EER, TAR and FMR. A system can make two kinds of mistake: rejecting a real user
+(false reject) or accepting a stranger (false match). Moving the threshold
+trades one for the other. EER is the error rate at the point where both kinds
+are equal, so it summarises accuracy without choosing a threshold. TAR and FMR
+are measured at the actual locked threshold, which is what a real user would
+experience.
 
-SAY: We call a difference real only when the reshuffling shows it cannot be
-explained by luck.
+Linkability (Dsys). Take two protected templates made with different keys.
+Compare their scores when they come from the same person with their scores when
+they come from different people. If these two groups of scores look the same, an
+observer cannot tell which pairs are the same person, so the templates are
+unlinkable. Dsys measures how far apart the two groups are, from 0 (identical,
+unlinkable) to 1 (completely separate, fully linkable).
+
+Attack success and post-revocation acceptance. These two measures (SAR and PRAR)
+are explained on Slides 17 and 18.
+
+Bootstrap intervals. We have only one sample of people, so every result has some
+luck in it. The bootstrap estimates how much. It builds many new samples by
+drawing people at random from the ones we have (some twice, some not at all),
+recalculates the result each time, and looks at how much it moves. The middle
+95% of those results gives the interval.
+
+Why resample people, not comparisons. One person produces many comparisons, and
+they are not independent: a person with a quiet voice affects all of their
+comparisons in the same way. Treating thousands of comparisons as independent
+would make us look far more certain than we are. Resampling whole people keeps
+the uncertainty honest. For the cancelling test, results also vary a lot from
+key to key, so keys are resampled too.
+
+In one line: different measures for different requirements, and uncertainty
+estimated by resampling whatever really varies.
+
 
 Slide 12: Tools and data
 ------------------------
 
-ON THE SLIDE: Two tables: software with version numbers, and datasets with how
-much of each was used.
+Core idea: a result is only trustworthy if someone else can repeat it exactly.
 
-WHAT IT MEANS:
-- Software: PyTorch 2.11.0 for the calculations, facenet-pytorch 2.6.0 for
-  faces, SpeechBrain 1.1.1 for voices, and NumPy, pandas and SciPy for the
-  statistics.
-- Faces: the LFW collection. Of its 13,233 photos, 7,581 had a detectable face;
-  we kept people with at least 3 photos, which gave 900 people, and removed 100
-  who also appear in another face collection.
-- Voices: LibriSpeech, 150 speakers with 15 recordings each.
-- Outside check: VCTK, 110 speakers and 1,650 recordings.
-- The models ran on a normal processor and everything after that on one graphics
-  card (Tesla T4), with every random choice fixed in advance.
+Version pinning. Software changes over time, and a newer version can give
+slightly different numbers. Recording the exact version of every tool means
+anyone can rebuild the same setup.
 
-SAY: Every tool and every dataset is recorded with its exact version, so anyone
-can repeat the work and get the same numbers.
+Fixed random seeds. Random choices, such as how people are split or which keys
+are drawn, are made from one fixed starting number (the seed). The same seed
+always gives the same random choices, so the whole study can be re-run and give
+identical results.
+
+Keeping future tests clean. A later face test is planned on another collection
+called CFP. If the same people appeared in both collections, that future test
+would not really use new people. So 100 people whose names also appear in CFP
+were removed now, in advance.
+
+In one line: exact versions and fixed seeds make the results repeatable, and
+removing overlapping people keeps future tests fair.
+
 
 PART 3: RESULTS
 ===============
 
+
 Slide 13: The locked settings
 -----------------------------
 
-ON THE SLIDE: A table of the locked settings for voice and face, a chart showing
-how they were chosen, and a note that the face pass mark was relaxed.
+Core idea: a protection scheme cannot do better than the recognition model
+underneath it, and targets must be set before testing.
 
-WHAT IT MEANS:
-- Voice: 128 groups of 32, pass mark 37. On the 42 development people this gave
-  0.952% errors and accepted 95.2% of genuine attempts. 30 of the 80 settings
-  met the target.
-- Face: none of the 80 settings met the voice target. The best reached 2.29%
-  errors and 90.08% acceptance. The reason: the face model on its own, with no
-  protection at all, already makes 3.475% errors on these photos. So the face
-  target was relaxed to at most 3% errors and at least 85% acceptance. 13
-  settings then passed, and the chosen one uses 256 groups of 32 with pass mark
-  68.
-- This change was decided and written down before any test person's data was
-  opened.
+The encoder ceiling. Protection works on the embedding the model produces. If
+the model itself confuses two people, no protection can separate them again. So
+the model's own error rate is roughly the best the protected system can hope
+for. The face model makes more mistakes than the voice model on these photos,
+which is why face needed an easier target.
 
-SAY: The face target was relaxed openly and before testing, because the face
-model alone could not meet the stricter target.
+Relaxing a target honestly. Changing a target is not cheating if it is done
+before looking at the test data, for a stated reason, and reported openly. It
+becomes cheating only when targets are moved after seeing the results. Here the
+face target was relaxed during development, when it became clear no setting
+could reach it, and then locked.
+
+In one line: protection inherits the limits of the underlying model, and
+changing a target is fair only when it happens before testing.
+
 
 Slide 14: Testing on new people
 -------------------------------
 
-ON THE SLIDE: A results table, a bar chart comparing protected and unprotected
-error rates, and three labelled findings (firm, firm, not resolvable).
+Core idea: the honest measure of protection is its cost compared with the
+unprotected system, and that cost must be stated with its uncertainty.
 
-WHAT IT MEANS:
-- Voice on 58 new speakers: 1.93% errors (likely between 1.09% and 2.92%). It
-  accepts 94.0% of genuine attempts, and wrongly accepts 0.185% of impostor
-  attempts, about 1 in 540.
-- Face on new people: 4.80% errors, with a wide range (1.95% to 10.35%) because
-  there are few photos per person.
-- The bar chart compares the same people with and without protection.
-  Unprotected voice makes almost no mistakes: 0.085%. So protection costs 1.84
-  pp on the new speakers and 2.79 pp on the outside collection. Both are firm,
-  because the protected range starts above anything the unprotected system could
-  plausibly reach.
-- For face, protection costs 1.32 pp, but the ranges overlap too much to be
-  sure. That is what "not resolvable" means.
-- We do not say "X times worse", because unprotected voice makes less than one
-  mistake in the whole test. Dividing by a number that close to zero would give
-  a misleading result.
+Development versus test. Results on the people used for tuning are usually
+better than on new people, because the settings were chosen to suit the tuning
+group. The test on new people shows the realistic performance.
 
-SAY: On voice, protection costs about 2 extra mistakes per 100 attempts, and we
-are sure of it. On face, we cannot yet tell how big the cost is.
+Cost of protection. The fair question is not "is the error low?" but "how much
+higher is the error because of the protection?" The unprotected system is run on
+the same people, and the difference is the cost. On voice the cost is clear and
+firm. On face the uncertainty is too wide to measure the cost reliably, so the
+paper says so instead of guessing.
+
+Why no ratio. The unprotected voice system makes almost no mistakes, close to
+zero. Saying protection is "20 times worse" would be misleading, because
+dividing by a number near zero gives a huge ratio from a tiny absolute
+difference. The paper reports the difference in percentage points instead.
+
+Upper bounds when there are no errors. If a system makes zero or almost zero
+mistakes in a test, that does not prove its true error rate is zero. It means
+the rate is below some small limit. Statistics gives that limit (an upper
+bound), and the paper reports the bound rather than a misleading exact number.
+
+In one line: report protection as a cost against the unprotected system, avoid
+misleading ratios, and admit when the data cannot settle a question.
+
 
 Slide 15: Testing on a different voice collection
 -------------------------------------------------
 
-ON THE SLIDE: Four large numbers (2.80%, 89.00%, 0.080, 0.377%) and a chart
-comparing the main test with the outside test.
+Core idea: a system tuned on one collection may behave differently on another,
+and a fixed threshold is the first thing to drift.
 
-WHAT IT MEANS:
-- We took the voice system exactly as locked and used it, unchanged, on VCTK.
-  This is a different collection with different speakers, accents and recording
-  equipment. There were 1,100 genuine comparisons and 119,900 impostor
-  comparisons.
-- Errors: 2.80% (likely 1.99% to 3.81%). This is a little higher than 1.93% on
-  the main test, but the ranges overlap, so there is no clear evidence of a real
-  drop.
-- Genuine attempts accepted: 89.0%. Linkability: 0.080, even lower than in the
-  main test.
-- One target was missed. The system wrongly accepted 0.377% of impostor
-  attempts, about 1 in 265, while the goal was 0.1%, or 1 in 1,000. As planned,
-  the pass mark set on the first collection was kept unchanged here.
+Domain shift. Different collections differ in microphones, accents, rooms and
+speaking style. These differences move all the similarity scores a little, which
+is called domain shift. A system that has quietly adapted to one collection can
+lose accuracy on another.
 
-SAY: On a completely new collection the system still worked well. We report
-openly the one target it missed.
+Why overall accuracy held but false matches rose. The overall error rate (EER)
+is measured at the best threshold for the new data, so it adapts automatically.
+The false match rate is measured at the locked threshold, which was set on the
+first collection. If impostor scores shift slightly upward on the new
+collection, more of them cross the old threshold. So the error rate can stay
+similar while the false match rate goes above target. In practice, a deployed
+system would recalibrate its threshold for a new setting.
+
+In one line: the protection kept working on new data; only the fixed threshold
+needed recalibrating, as expected under domain shift.
+
 
 Slide 16: What the polynomial costs
 -----------------------------------
 
-ON THE SLIDE: Three versions of the system, and a stacked bar chart that splits
-the voice error into parts.
+Core idea: an ablation splits the total cost into parts, so each step is held
+responsible for its own share.
 
-WHAT IT MEANS: We built three versions and tested them on the same people:
-- PolyIoM, our full system with the polynomial and the hashing: 1.928% errors.
-- Linear map, where a simple key-based shrinking from 192 to 48 numbers replaces
-  the polynomial: 0.700% errors.
-- IoM only, hashing with no shrinking at all: 0.273% errors.
-The chart stacks the differences:
-- 0.273% comes from the hashing itself.
-- 0.427 pp more comes from shrinking 192 numbers to 48.
-- 1.228 pp more comes from the polynomial's mixing. This part is firm: its range
-  is 0.29 to 2.19 pp, all above zero.
-Linkability is similar for all three versions. For face, the data is not enough
-to separate the versions.
+Three versions, one difference at a time. Hashing alone is the starting point.
+Adding a simple linear shrinking step shows the cost of making the data smaller.
+Replacing the linear step with the polynomial shows the extra cost of non-linear
+mixing. Because only one thing changes at each step, each difference can be
+blamed on that one change.
 
-SAY: Most of the accuracy cost comes from the polynomial. The next slide shows
-what we get in return.
+Why shrinking costs accuracy. Fewer numbers carry less detail about the person,
+so two similar people are confused more often.
+
+Why non-linear mixing costs more. Non-linear mixing can bend small differences
+between recordings of the same person into larger differences after mixing. So
+two recordings of the same person agree a little less after the polynomial.
+
+Paired comparison. All three versions are tested on exactly the same people and
+recordings. Differences between people therefore cancel out, and the comparison
+is sharper than comparing different groups.
+
+In one line: most of the accuracy cost comes from the polynomial's non-linear
+mixing, not from the shrinking or the hashing.
+
 
 Slide 17: What an attacker can and cannot do
 --------------------------------------------
 
-ON THE SLIDE: A box describing the attacker, a large "100%", and a bar chart of
-similarity scores.
+Core idea: getting accepted and recovering the real biometric are two different
+things, and a scheme can prevent one without preventing the other.
 
-WHAT IT MEANS:
-- The attacker is the strongest possible one: they have stolen the template and
-  also know both secret keys and how the system works. Starting from random
-  numbers, they adjust a fake embedding step by step (800 steps, 5 fresh starts)
-  until it produces the stolen template.
-- Finding 1, the 100%: the attacker succeeded every time, for every version, on
-  both face and voice. Each fake was accepted by the system. This is because the
-  system only compares templates, so any input that makes the right template
-  gets in.
-- Finding 2, the chart: how close is the fake to the person's real voice?
-  - IoM only: 0.913. The fake is almost the real voice.
-  - Linear map: 0.490. About halfway.
-  - PolyIoM: 0.222. Close to a random guess (0.120).
-  - For face the scores are 0.876, 0.492 and 0.418.
-- In plain terms: the attacker can open the door, but with the polynomial they
-  do not learn what the person's voice really is.
+The strongest attacker. Security researchers assume the attacker knows
+everything except the secret they are trying to find. This is Kerckhoffs's
+principle. Here we go further and give the attacker the keys too. This worst
+case shows what protection remains once everything else has leaked.
 
-SAY: A thief who knows every secret can fool the system. But with the
-polynomial, they learn very little about the real person's voice. That is
-exactly why cancelling must work.
+How the attack works. The attacker starts from a random guess and nudges it,
+step by step, until the system produces the stolen template from it. There is
+one difficulty: "which one is largest" gives no sense of direction for how to
+improve the guess. The attack therefore uses a soft version of "largest", one
+that blends the options and gives a direction. It then gradually sharpens it
+back into a hard choice. This sharpening is called annealing.
+
+Acceptance versus recovery. The system only checks whether the template matches.
+Any input that produces the right template is accepted, whether or not it is the
+real person. Because the polynomial and the hashing throw information away, many
+different inputs produce the same template. The attacker finds one of them, and
+that is enough to get in. So the attack succeeds against every version.
+
+Why the polynomial still hides the person. Finding an input that gets in is not
+the same as finding the real input. A linear shrinking step keeps a fixed part
+of the information unchanged, so any input that fits must agree with the real
+voice on that part, and the attacker's copy partly resembles the real voice. The
+polynomial mixes non-linearly, so the inputs that fit can be very different from
+the real voice, and the attacker's copy is close to a random guess. In plain
+words: knowing that two numbers add up to 10 does not tell you they were 3 and
+7.
+
+Why this makes cancelling essential. Since a well-informed attacker can always
+get in with a stolen template, the real defence is to cancel the template as
+soon as a theft is known. That is tested on the next slide.
+
+In one line: the attacker can forge a match but cannot learn the real voice, so
+the defence that matters is cancelling the stolen template.
+
 
 Slide 18: Can a stolen template be cancelled?
 ---------------------------------------------
 
-ON THE SLIDE: A bar chart of PRAR, three large numbers (80/80, 12/80, 0/80), a
-dot chart with one dot per key, and a box headed "A correction we made".
+Core idea: cancelling works only if what the attacker recovers depends on the
+old key.
 
-WHAT IT MEANS: The test runs like this. The attacker builds a fake from a stolen
-template. The company changes the keys and re-enrols everyone. Then the attacker
-tries the old fake again. We repeated this with 40 new keys for voice and 40 for
-face, 80 in total.
-- IoM only: the old fake still worked for every person, under every new key:
-  100%, 80 out of 80. Cancelling does not work, because the fake is basically
-  the real voice.
-- PolyIoM: on average, 7.5% of old fakes still worked for voice and 25.6% for
-  face. For most keys, the number was 0%. But for 12 of the 80 keys, half or
-  more of the fakes still worked, and for 8 of those, all of them did. We do not
-  yet know why these keys behave badly.
-- Linear map: steady and low, 5.7% for voice and 2.9% for face. No key let half
-  or more through.
-- The correction box: an earlier test with only 3 keys suggested that PolyIoM
-  was clearly worse than the linear map, by 4.6 pp. When we repeated it with 40
-  keys and reshuffled the keys too, the difference became -1.8 pp, with a range
-  from -8.8 to +4.0, which crosses zero. So the earlier claim was wrong, and we
-  withdrew it.
+The cancelling test, step by step:
+1. Steal a template.
+2. Build a fake input from it, as on Slide 17.
+3. Change the keys and re-enrol the person.
+4. Try the old fake against the new template.
+If cancelling works, the old fake should now fail.
 
-SAY: Without the secret shrinking step, cancelling never works. With it,
-cancelling works for most keys. We also show one earlier claim that did not
-survive a bigger test.
+Why hashing alone fails every time. Without keyed compression, the fake input is
+essentially the real voice, because the attack recovers the embedding itself.
+The real voice matches the person under any key, so the old fake keeps working
+forever.
+
+Why keyed compression succeeds. With keyed compression, the fake input only fits
+the old mixing. Under a new key the mixing is different, and the old fake no
+longer produces a matching template.
+
+Key-to-key variation. Most new keys cancel perfectly, but a few cancel poorly,
+and the paper does not yet know why. This is why the average can mislead: a few
+bad keys raise the average even when the typical key is perfect. It is also why
+the uncertainty must account for keys, not just people.
+
+The correction. An early test used only 3 keys and suggested the polynomial
+cancelled worse than the linear map. With 3 keys, one unusual key can swing the
+result, and resampling only people hides that. With 40 keys and resampling of
+keys as well, the difference disappeared. The paper withdrew the claim. This
+shows the lesson of Slide 11 in action: resample whatever really varies, or you
+will be over-confident.
+
+In one line: keyed compression makes stolen templates cancellable because the
+attacker's copy is tied to the old key, and testing with too few keys can give
+false conclusions.
+
 
 Slide 19: Summary of results
 ----------------------------
 
-ON THE SLIDE: One table with the four requirements, what the system achieved,
-and a label for each: "confirmatory" or "secondary".
+Core idea: each result is labelled by how strong its evidence is.
 
-WHAT IT MEANS:
-- Recognition: 1.93% errors on new speakers and 2.80% on a new collection.
-  Confirmatory.
-- Accuracy cost: 1.84 pp and 2.79 pp on voice, both firm; face unclear.
-  Confirmatory.
-- Linkability: 0.088 and 0.080, near the ideal 0. Confirmatory.
-- Hiding the real voice: 0.222 against 0.913 without the polynomial, but the
-  attacker still gets in 100% of the time. Secondary.
-- Cancelling: works for most keys, and only because of the secret shrinking
-  step. Secondary.
-"Confirmatory" means the test was in the plan written in advance and was run
-once. "Secondary" means we added it afterwards, so it is supporting evidence.
+Confirmatory results were in the plan written before testing and were run once,
+so they cannot have been shaped by the data. They carry the most weight.
+Secondary results were added later to explain the confirmatory ones. They are
+informative, but readers should give them somewhat less weight, because the
+decision to run them was made after seeing some data.
 
-SAY: All four requirements in one table, each marked with how strong the
-evidence is.
+The overall picture. Keyed compression provides cancelling, and the polynomial
+provides concealment. These are two different jobs done by two different
+properties of the design, which is the paper's central message.
+
+In one line: the four requirements in one view, with an honest label for how
+strong each piece of evidence is.
+
 
 PART 4: WHAT IT MEANS
 =====================
 
+
 Slide 20: Discussion
 --------------------
 
-ON THE SLIDE: Three cards: 6.1, 6.2 and 6.3.
+Core idea: what you measure decides what you conclude, so a study must measure
+the right things.
 
-WHAT IT MEANS:
-- 6.1: The polynomial hides the real voice (0.222 against 0.913) but does not
-  stop a fake from being accepted. A study that measured only "how well can the
-  voice be rebuilt" would conclude the system is safer than it really is.
-- 6.2: On recognition, the three versions differ by about 1 to 2 pp. On
-  linkability they hardly differ. On the attack, they all fail equally. Only the
-  cancelling test separates them clearly: 100% versus 7.5% versus 5.7%. So
-  cancelling is the most useful test, yet most studies never run it.
-- 6.3: Advice for other researchers: attack the simple versions with the same
-  attack, test each step separately, and test many keys, not just a few.
+Fidelity is not safety. A study that only checks how well the real voice can be
+rebuilt would call the polynomial very safe. But the attacker can still get in.
+Measuring only one notion of irreversibility gives an incomplete and over-
+optimistic picture.
 
-SAY: The test that best tells designs apart is the one most studies skip.
+The measure that separates designs. On accuracy the versions differ a little, on
+linkability hardly at all, and against a fully informed attacker they all fail
+to block entry. Only the cancelling test shows a dramatic difference: hashing
+alone never cancels, while keyed compression does. So the least-tested
+requirement turns out to be the most informative one.
+
+Advice for the field. Attack the simple versions too, so that differences mean
+something. Test each step separately. When results depend on random keys, test
+many keys, not a few.
+
+In one line: the requirement that most studies skip is the one that best reveals
+whether a design works.
+
 
 Slide 21: Which design to choose
 --------------------------------
 
-ON THE SLIDE: Two columns, the keyed polynomial on the left and the keyed linear
-map on the right, joined by a bar labelled TRADE.
+Core idea: the right design depends on which harm you most need to prevent.
 
-WHAT IT MEANS:
-- Accuracy: polynomial 1.928% errors, linear map 0.700%. The linear map is
-  better by 1.23 pp, and this is firm.
-- Hiding the real voice: polynomial 0.222, linear map 0.490. The polynomial
-  hides much more. For face: 0.418 against 0.492.
-- Cancelling: with the polynomial, 12 of 80 keys let half or more of the fakes
-  through. With the linear map, 0 of 80.
-- When to choose the polynomial: when the worst outcome is someone learning a
-  person's real face or voice, which can never be changed.
-- When to choose the linear map: when the worst outcome is a stolen login, which
-  a new key can fix.
-- Either way: always include the secret shrinking step. Without it, a stolen
-  template works forever.
+Two kinds of harm. If a template leaks, two bad things can follow. First, the
+thief can log in as the person. This harm can be repaired, because cancelling
+the template and issuing a new key stops it. Second, the thief can learn the
+person's real face or voice. This harm cannot be repaired, because nobody can be
+given a new face.
 
-SAY: Neither design wins on everything. Choose the polynomial to protect the
-biometric itself, and the linear map for higher accuracy and more reliable
-cancelling.
+Matching the design to the harm. The polynomial is better at preventing the harm
+that cannot be repaired, since it hides the real biometric. It pays for this
+with lower accuracy and less even cancelling. The linear map is more accurate
+and cancels more reliably, but reveals more of the biometric. A system for
+highly sensitive uses might prefer the polynomial. A system where convenience
+and dependable cancelling matter most might prefer the linear map.
+
+The rule that holds either way. Always use keyed compression before hashing.
+Without it, a stolen template can never be cancelled, whichever other choices
+are made.
+
+In one line: choose the polynomial to protect the irreplaceable biometric, the
+linear map for accuracy and reliable cancelling, and never skip keyed
+compression.
+
 
 Slide 22: Limitations
 ---------------------
 
-ON THE SLIDE: Ten numbered limits, one line each.
+Core idea: limitations tell the audience how far each result can be trusted and
+where it might not apply.
 
-WHAT IT MEANS:
-- 01: only 58 test people, so face results describe what happened but cannot
-  prove much.
-- 02: only voice was checked on a second collection; face was not.
-- 03: only one type of attack was tried; a cleverer attack might do better.
-- 04: the 40 new keys were made from the same family as K*, not chosen through
-  Stage A again.
-- 05: we do not know why 12 of the 80 polynomial keys failed to cancel well.
-- 06: the linear map used the settings tuned for the polynomial, not settings of
-  its own.
-- 07: face enrols with one photo, while voice uses the average of five
-  recordings.
-- 08: unprotected voice made almost no mistakes, so we give limits rather than
-  ratios.
-- 09: the face model alone makes about 3% errors, which caps how good face can
-  be.
-- 10: the list used to remove overlapping people came from an unofficial copy
-  and matched exact names only.
+Statistical power. With a modest number of test people, small differences cannot
+be told apart from luck. That is why some face results are described but not
+claimed as firm.
 
-SAY: These limits tell the audience how far to trust each result. None of them
-changes the main findings.
+Generalisation. Results checked on one collection may not hold on another. Voice
+was checked on a second collection, face was not, so face results are less
+certain to transfer.
+
+One attack is a lower bound. If one attack recovers a certain amount, a cleverer
+attack might recover more. So the attack results show the minimum risk, not the
+maximum.
+
+Open questions. Some keys cancel poorly for reasons not yet understood. The
+linear map was not tuned on its own, so it might do even better with its own
+settings.
+
+In one line: these limits mark where the evidence is strong and where more work
+is needed; none of them reverses the main findings.
+
 
 Slide 23: Conclusion
 --------------------
 
-ON THE SLIDE: The main message on a dark background, three large numbers, a
-recommendation, and a line about checking the results.
+Core idea: two parts of the design do two different jobs, and the choice between
+them is a trade-off.
 
-WHAT IT MEANS:
-- The main message: the secret shrinking step makes cancelling possible, and the
-  polynomial hides the real biometric. Choosing between the polynomial and the
-  simpler linear map is a trade-off.
-- The three numbers: 1.93% voice errors on new speakers; 80 of 80 failures to
-  cancel without the shrinking step; and 0.222 against 0.490, how much of the
-  real voice an attacker recovers with the polynomial versus the linear map.
-- The recommendation for researchers: attack the simple versions too, test each
-  step, compare with the unprotected system, and test what happens after a key
-  change.
-- The last line: anyone can type one command (python3 run.py verify). It runs 74
-  checks and 29 tests, and confirms that two separate programs produce exactly
-  the same 32,768 template values.
+The message to remember. Keyed compression is what lets a stolen template be
+cancelled. The polynomial is what hides the real biometric from an attacker.
+They are separate benefits, and the second costs accuracy.
 
-SAY: Shrink the data with a secret key so templates can be cancelled. Add the
-polynomial if hiding the real biometric is worth a small loss of accuracy. And
-every number in this talk can be checked with one command.
+The message for researchers. To evaluate such schemes fairly, attack the simple
+versions with the same attack, test each step on its own, compare with the
+unprotected system, and test what happens after a template is cancelled.
+
+Verifiability. Every number can be re-derived from the stored results with one
+command. Two independent implementations produce identical templates, which
+shows the results do not depend on a hidden detail of one program.
+
+In one line: compress under a key to make cancelling possible, add the
+polynomial when hiding the biometric is worth some accuracy, and test schemes
+the way this paper does.
+
 
 Slide 24: Declarations
 ----------------------
 
-ON THE SLIDE: Three short statements: AI use, data and code, and ethics.
+Core idea: openness about methods, data and ethics is part of trustworthy
+research.
 
-WHAT IT MEANS:
-- AI use: an AI assistant helped write the code for the extra analyses, the
-  figures, the checking package and the text. The test plan, the groups of
-  people, the key, the locked settings and the main results were all produced
-  before the AI was involved, and none of them were changed.
-- Data and code: the code, the stored results, the 29 tests and the checking
-  script are shared. The face and voice number lists are not shared, because
-  they are still personal biometric data.
-- Ethics: no new people were recorded; only public collections were used. The
-  attack was run only on templates we made ourselves, never on a real system or
-  anyone else's data.
+AI assistance. The paper states exactly what the AI helped with and confirms
+that the core design and main results came before that help and were not
+changed. This lets readers judge the work fairly.
 
-SAY: We state clearly how AI was used, what we share and why, and why the attack
-experiments are safe.
+Why embeddings are not shared. An embedding is not anonymous. It is a
+description of a person's face or voice, and Slide 17 shows it can be partly
+rebuilt. Sharing it would be sharing biometric data, so only code and results
+are shared.
 
-THREE THINGS TO REMEMBER
-========================
+Ethical attack research. Studying attacks is how defences improve. Doing it
+responsibly means attacking only templates the researchers created themselves,
+on public data, never a live system or real users.
 
-- The secret shrinking step is what makes cancelling work. Without it, a stolen
-  template kept working in 80 out of 80 tests.
-- The polynomial hides the real voice: an attacker's copy scores 0.222, close to
-  a random guess, against 0.490 with a simple linear map.
-- That hiding costs about 1.2 extra voice errors per 100 attempts, and
-  cancelling works less evenly across keys. It is a trade-off, not a free gain.
+In one line: we are open about how the work was done, careful with biometric
+data, and responsible about attack experiments.
+
+
+THREE IDEAS TO REMEMBER
+=======================
+
+- What an attacker recovers decides whether cancelling works. If they recover
+  the real biometric, no key change helps. Keyed compression makes sure they
+  recover only something tied to the old key.
+- Getting in and learning who you are are different harms. The polynomial does
+  not stop the first, but it greatly reduces the second.
+- Protection always costs something. The polynomial trades a little accuracy for
+  better hiding, and the right choice depends on which harm matters most.
+
 
 QUESTIONS PEOPLE MAY ASK
 ========================
 
-Q: The attacker gets in 100% of the time. Isn't the system broken?
-A: That attacker already knows every secret key, which is the worst case. It is
-   exactly why cancelling matters: once a theft is discovered, the keys are
-   changed, and our tests show that the old fakes then stop working for most
-   keys.
+Q: If the attacker always gets in, what is the point of the protection?
+A: The attacker in our test already knows every secret key, which is the worst
+   case. Protection then works in two ways. The attacker learns little about the
+   real person, and once the theft is noticed the template is cancelled, after
+   which the old fake stops working for most keys.
 
-Q: Why not just use the linear map, since it is more accurate?
-A: Because it reveals more of the real voice (0.490 against 0.222). A stolen
-   password can be changed, but a stolen face or voice cannot.
+Q: Why does changing the key not help when only hashing is used?
+A: Because the attack rebuilds the person's real embedding, which does not
+   depend on any key. The real biometric matches under any new key.
 
-Q: How do we know you did not tune the results to look good?
-A: The key, the settings and the pass mark were chosen on separate people and
-   locked before the test people were opened. The outside collection was tested
-   last, without any changes.
+Q: Why is the polynomial better at hiding than a linear map?
+A: A linear map keeps part of the information unchanged, so any copy that gets
+   in must share that part with the real voice. The polynomial mixes non-
+   linearly, so copies that get in can be very different from the real voice.
 
-Q: Can someone else repeat this?
-A: Yes. Every software version and random seed is recorded, and one command re-
-   checks every number from the stored results.
+Q: How do we know the results were not tuned to look good?
+A: All choices were made on separate people and locked before the test data were
+   opened, following a plan written in advance.
 
 Q: What is still unknown?
-A: Why 12 of the 80 polynomial keys cancel poorly, and whether the face results
+A: Why a minority of polynomial keys cancel poorly, and whether the face results
    hold on a larger, separate face collection.
