@@ -1,0 +1,73 @@
+{
+  "analysis": "unprotected_cosine_baseline",
+  "units": "percent",
+  "source": "transcribed from the SCOREDUMP notebook console output, 2026-09-22; protected EERs reproduced the sealed held-out values exactly in that run",
+  "bound_rule": "one-sided 95% Clopper-Pearson upper bound on the genuine error rate, k = floor(eer * n_genuine) errors; reported wherever eer < 1/n_genuine",
+  "partitions": [
+    {
+      "modality": "voice",
+      "partition": "development",
+      "n_subjects": 42,
+      "n_genuine": 420,
+      "n_impostor": 17220,
+      "protected_eer": 0.9524,
+      "unprotected_eer": 0.0,
+      "cost_pp": 0.9524,
+      "one_genuine_error_pct": 0.2381,
+      "baseline_resolved": false,
+      "unprotected_upper_bound_95": 0.7107
+    },
+    {
+      "modality": "voice",
+      "partition": "evaluation",
+      "n_subjects": 58,
+      "n_genuine": 580,
+      "n_impostor": 33060,
+      "protected_eer": 1.9282,
+      "unprotected_eer": 0.0848,
+      "cost_pp": 1.8434,
+      "one_genuine_error_pct": 0.1724,
+      "baseline_resolved": false,
+      "unprotected_upper_bound_95": 0.5152
+    },
+    {
+      "modality": "voice",
+      "partition": "external",
+      "n_subjects": 110,
+      "n_genuine": 1100,
+      "n_impostor": 119900,
+      "protected_eer": 2.7977,
+      "unprotected_eer": 0.0033,
+      "cost_pp": 2.7944,
+      "one_genuine_error_pct": 0.0909,
+      "baseline_resolved": false,
+      "unprotected_upper_bound_95": 0.272
+    },
+    {
+      "modality": "face",
+      "partition": "development",
+      "n_subjects": 42,
+      "n_genuine": 262,
+      "n_impostor": 10742,
+      "protected_eer": 2.8391,
+      "unprotected_eer": 2.6718,
+      "cost_pp": 0.1673,
+      "one_genuine_error_pct": 0.3817,
+      "baseline_resolved": true,
+      "unprotected_upper_bound_95": 4.9596
+    },
+    {
+      "modality": "face",
+      "partition": "evaluation",
+      "n_subjects": 58,
+      "n_genuine": 259,
+      "n_impostor": 14763,
+      "protected_eer": 4.7995,
+      "unprotected_eer": 3.4749,
+      "cost_pp": 1.3246,
+      "one_genuine_error_pct": 0.3861,
+      "baseline_resolved": true,
+      "unprotected_upper_bound_95": 5.5041
+    }
+  ]
+}
