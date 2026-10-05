@@ -14,11 +14,16 @@ polyiom/             the pipeline as plain NumPy, runnable anywhere
   parity.py          checks core.py against the study's PyTorch code
 results/             the stored outputs of each analysis
   sweep/             the two sealed 80-setting sweeps (hash-checked)
-figures/             the results figures as drawn by figures.py (PNG and PDF)
   environment/       13 sealed provenance records: encoders, corpora, grid, compute
+figures/             the results figures as drawn by figures.py (PNG and PDF)
 ENVIRONMENT.md       frameworks, models, corpora and compute, read from those records
-code/runtime/        the analysis code as the study ran it (*_only.py)
-code/notebooks/      the Colab notebooks that load and run it
+code/runtime/        the analysis code as the study ran it (*_only.py), plus
+                     results_plots.py and allfigures_only.py (figures from code)
+code/notebooks/      the Colab notebooks that load and run it, including
+                     ALL_FIGURES, which recomputes every result and draws
+                     every figure from it
+code/build_all_figures_notebook.py   assembles ALL_FIGURES from code/runtime/
+code/check_all_figures_notebook.py   runs ALL_FIGURES end to end on stand-in data
 code/figures/        figure builders and the figure explanation text
 tests/               29 unit tests for the pipeline and the metrics
 REVIEWER.md          the five-minute path, and what we would raise ourselves
@@ -110,9 +115,20 @@ rather than buried in notebook cells.
 | `REVOCATION` | `revocation_only.py` | `runs/revocation/revocation_result.json` |
 | `SCOREDUMP` | `scoredump_only.py` | `runs/scores/score_histograms.json` |
 | `FIGURES` | `figures_only.py`, `docx_only.py` | the four results figures, and the docx |
+| `ALL_FIGURES` | all of the above, plus `allfigures_only.py` and `results_plots.py` | `runs_regenerated/` and `figures_regenerated/`; never `runs/` |
 
 Order matters only in two places: every analysis needs the sealed held-out
 results first, and `FIGURES` needs `SCOREDUMP`.
+
+`ALL_FIGURES` is the one to run for the figures. It recomputes the sweep,
+the score histograms, the confidence intervals, the protection cost, the
+ablation, the attack and the revocation test from the embeddings and the
+sealed keys, compares every number with the study's original outputs, and
+draws all twelve results figures (3 to 8, S2, P and A to D) from what it has
+computed. It carries its own copy of the runtime files, so it needs nothing
+on Drive except the study's data. `code/check_all_figures_notebook.py` runs
+it twice on a synthetic stand-in project and confirms the second run
+reproduces the first exactly.
 
 Every analysis is read-only with respect to the study. None fits a
 threshold, none re-opens selection, and each records `changes_any_seal:
