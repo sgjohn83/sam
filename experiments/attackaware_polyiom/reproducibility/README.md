@@ -7,6 +7,7 @@ that produced them.
 run.py               one entry point: verify | test | demo | parity | figures | all
 verify.py            recomputes every number the paper reports, from results/
 figures.py           draws the eight results figures from results/ into figures/
+figures_from_scores.py  draws Figures A-D from score_histograms.json (any computer)
 polyiom/             the pipeline as plain NumPy, runnable anywhere
   core.py            hardening, hashing, matching
   metrics.py         EER, D_link, D_sys, TAR, FMR, PRAR
@@ -42,6 +43,7 @@ MANIFEST.sha256      hashes of every file here
 ```
 python3 run.py verify     # no dependencies at all
 python3 run.py figures    # redraw the results figures (numpy, matplotlib)
+python3 figures_from_scores.py score_histograms.json   # Figures A-D (adds scipy)
 python3 run.py all        # add numpy, and torch if you have it
 ```
 
