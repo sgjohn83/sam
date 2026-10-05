@@ -1,0 +1,29 @@
+{
+  "analysis": "heldout_and_external_confidence_intervals",
+  "units": "percent for EER, TAR and FMR; fraction for Dsys",
+  "method_id": "identity_cluster_percentile_v1",
+  "n_bootstrap": 2000,
+  "confidence": 0.95,
+  "master_seed": 2026,
+  "source": "transcribed from the held-out and external confidence-run console output; these intervals are reported in Sections 5.2 and 5.3 of the paper. The raw run output is not part of this package. figures.py checks every point estimate below against the sealed result JSONs before drawing, so a transcription error in a point would stop the build.",
+  "partitions": {
+    "voice/evaluation": {
+      "EER": [1.928, 1.092, 2.919],
+      "TAR": [93.966, 89.655, 97.414],
+      "FMR": [0.185, 0.028, 0.480],
+      "Dsys": [0.088431, 0.070803, 0.218493]
+    },
+    "face/evaluation": {
+      "EER": [4.799, 1.945, 10.345],
+      "TAR": [82.239, 72.767, 89.933],
+      "FMR": [0.041, 0.000, 0.218],
+      "Dsys": [0.150803, 0.122519, 0.282221]
+    },
+    "voice/external": {
+      "EER": [2.798, 1.992, 3.807],
+      "TAR": [89.000, 85.727, 91.727],
+      "FMR": [0.377, 0.202, 0.622],
+      "Dsys": [0.080300, 0.060294, 0.155097]
+    }
+  }
+}

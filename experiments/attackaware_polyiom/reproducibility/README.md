@@ -4,14 +4,17 @@ Everything needed to check the paper's numbers, and to rerun the analyses
 that produced them.
 
 ```
-run.py               one entry point: verify | demo | parity | all
+run.py               one entry point: verify | test | demo | parity | figures | all
 verify.py            recomputes every number the paper reports, from results/
+figures.py           draws the eight results figures from results/ into figures/
 polyiom/             the pipeline as plain NumPy, runnable anywhere
   core.py            hardening, hashing, matching
   metrics.py         EER, D_link, D_sys, TAR, FMR, PRAR
   demo.py            end to end on synthetic data
   parity.py          checks core.py against the study's PyTorch code
 results/             the stored outputs of each analysis
+  sweep/             the two sealed 80-setting sweeps (hash-checked)
+figures/             the results figures as drawn by figures.py (PNG and PDF)
   environment/       13 sealed provenance records: encoders, corpora, grid, compute
 ENVIRONMENT.md       frameworks, models, corpora and compute, read from those records
 code/runtime/        the analysis code as the study ran it (*_only.py)
@@ -33,6 +36,7 @@ MANIFEST.sha256      hashes of every file here
 
 ```
 python3 run.py verify     # no dependencies at all
+python3 run.py figures    # redraw the results figures (numpy, matplotlib)
 python3 run.py all        # add numpy, and torch if you have it
 ```
 

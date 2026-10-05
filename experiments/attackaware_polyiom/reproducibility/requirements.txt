@@ -7,7 +7,9 @@ numpy>=1.20          # tested with 2.4.6
 # against the study's PyTorch one. Absent, parity reports SKIPPED.
 # torch>=2.0         # tested with 2.14.0+cu130 (CPU is enough)
 
-# Optional: only for rebuilding the four results figures from
-# score_histograms.json.
+# Optional: for `run.py figures`, which draws the results figures from
+# results/ (tested with matplotlib 3.11.2). The four score-distribution
+# figures in code/runtime/figures_only.py also need scipy and
+# score_histograms.json, which is not in this package.
 # matplotlib>=3.5
 # scipy>=1.7

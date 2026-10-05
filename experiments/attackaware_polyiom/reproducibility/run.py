@@ -5,7 +5,9 @@
     python3 run.py test       unit tests for pipeline + metrics  (numpy)
     python3 run.py demo       run the pipeline on synthetic data (numpy)
     python3 run.py parity     check NumPy against PyTorch        (torch)
-    python3 run.py all        all four
+    python3 run.py figures    draw the results figures from results/
+                                                    (numpy, matplotlib)
+    python3 run.py all        all five
 
 Run `verify` first. It needs nothing but Python and tells you whether the
 manuscript matches the stored results.
@@ -67,8 +69,15 @@ def cmd_parity():
     return 0 if ok else 1
 
 
+def cmd_figures():
+    banner("figures — the results figures, drawn from results/")
+    if not (need("numpy", "The figures") and need("matplotlib", "The figures")):
+        return 1
+    return subprocess.call([sys.executable, str(HERE / "figures.py")])
+
+
 COMMANDS = {"verify": cmd_verify, "test": cmd_test,
-            "demo": cmd_demo, "parity": cmd_parity}
+            "demo": cmd_demo, "parity": cmd_parity, "figures": cmd_figures}
 
 
 def main(argv):
@@ -77,7 +86,7 @@ def main(argv):
         return 0 if len(argv) == 2 else 2
     name = argv[1]
     if name == "all":
-        codes = [COMMANDS[c]() for c in ("verify", "test", "parity", "demo")]
+        codes = [COMMANDS[c]() for c in ("verify", "test", "parity", "demo", "figures")]
         banner("done")
         print("all steps exited cleanly" if not any(codes)
               else f"a step failed: exit codes {codes}")

@@ -17,19 +17,21 @@ cd reproducibility
 python3 run.py verify      # the paper's numbers. Python only, ~1 second
 python3 run.py demo        # the pipeline on synthetic data. needs numpy
 python3 run.py parity      # NumPy vs the study's PyTorch. needs torch
-python3 run.py all         # all three
+python3 run.py figures     # the results figures, from results/. needs matplotlib
+python3 run.py all         # all of the above
 ```
 
 `run.py --help` lists them. Every command exits non-zero on failure, so
 they drop straight into CI.
 
-The three answer different questions:
+Each answers a different question:
 
 | Command | Question | Needs |
 |---|---|---|
 | `verify` | does the manuscript match the stored results? | Python 3.8 |
 | `demo` | does the pipeline code actually run? | numpy |
 | `parity` | is the NumPy pipeline the same maths as the study's? | torch |
+| `figures` | can every results figure be redrawn from the stored results? | numpy, matplotlib |
 
 ### `demo` — running the pipeline without the data
 
