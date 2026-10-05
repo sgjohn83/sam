@@ -54,14 +54,14 @@ for ax in (axa, axb):
 axa.text(0, 99, "(a)  Protected template construction", fontsize=8.8,
          color=INK, ha="left", va="top")
 
-W, GAP, Y0, Y1 = 14.2, 3.0, 62, 80
-xs = [1.0 + i * (W + GAP) for i in range(6)]
+W, GAP, Y0, Y1 = 13.8, 2.9, 50, 68
+xs = [1.0 + i * (W + GAP) for i in range(6)]  # last box ends at 98.3
 stages = [
     "biometric\nsample",
     "frozen encoder\nFaceNet · ECAPA",
-    "embedding\n$x \\in \\mathbb{R}^{512}$",
+    "embedding\n$x \\in \\mathbb{R}^{d}$",
     "polynomial\ntransform",
-    "IoM hash\n$M$ windows, $q$ buckets",
+    "IoM-GRP hash\n$M$ groups of $q$",
     "protected code\n$z \\in \\{0..q\\!-\\!1\\}^{M}$",
 ]
 for i, (x0, txt) in enumerate(zip(xs, stages)):
@@ -72,12 +72,12 @@ for i, (x0, txt) in enumerate(zip(xs, stages)):
     if i:
         arrow(axa, x0 - GAP, (Y0 + Y1) / 2, x0, (Y0 + Y1) / 2)
 
-# The key feeds the two keyed stages.
-box(axa, xs[3] + 1.0, xs[4] + W - 1.0, 40, 51,
+# The key feeds the two keyed stages, from above so no arrow crosses it.
+box(axa, 37.0, 96.0, 74, 84,
     "application key  $K$ = (coefficients $C$, exponents $E$, overlap $o$,"
     "  projection $R$)", fc=SURFACE, ec=BLUE, fs=7.0, tc=INK_2, lw=0.9)
 for i in (3, 4):
-    arrow(axa, xs[i] + W / 2, 51, xs[i] + W / 2, Y0, color=BLUE, lw=0.9)
+    arrow(axa, xs[i] + W / 2, 74, xs[i] + W / 2, Y1, color=BLUE, lw=0.9)
 
 # What is measured on the codes.
 box(axa, 30.0, 63.0, 12, 30,
@@ -128,15 +128,15 @@ for key, txt in uses:
 
 # The seal boundary.
 sx = seg_x["evaluation"][0]
-axb.plot([sx, sx], [20, 72], color=ORANGE, linewidth=1.3, zorder=5)
-axb.text(sx - 1.2, 73.5, "operating points sealed here", fontsize=7.0,
+axb.plot([sx, sx], [46, 78], color=ORANGE, linewidth=1.3, zorder=5)
+axb.text(sx - 1.2, 80.5, "operating points sealed here", fontsize=7.0,
          color=ORANGE, ha="right", va="bottom", fontweight="bold")
-axb.annotate("", xy=(sx - 16, 70), xytext=(sx - 1.5, 70),
+axb.annotate("", xy=(sx - 16, 77), xytext=(sx - 1.5, 77),
              arrowprops=dict(arrowstyle="-|>", color=ORANGE, linewidth=0.9,
                              mutation_scale=7))
 
-box(axb, 77.0, 99.0, 44, 65,
-    "external corpus\nVCTK, 110 speakers\n\nread last, after the\ninternal "
+box(axb, 76.0, 99.5, 34, 72,
+    "external corpus\nVCTK, 110 speakers\nread last, after the\ninternal "
     "method was frozen", fc=SURFACE, ec=ORANGE, fs=6.9, tc=INK_2, lw=0.9)
 
 axb.text(BX0, 14, "No stage to the left of the seal reads an evaluation "
