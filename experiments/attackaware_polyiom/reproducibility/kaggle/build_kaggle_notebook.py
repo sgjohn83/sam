@@ -113,7 +113,7 @@ RAW = Path(os.environ.get("POLYIOM_RAW", "/kaggle/tmp/attackaware_raw"))
 RUNTIME = Path(os.environ.get("POLYIOM_RUNTIME", "/kaggle/tmp/polyiom_runtime"))
 
 # Earlier sessions: copy their saved work back before anything is written.
-MARKER = ".attackaware_fresh"
+MARKER = "ATTACKAWARE_FRESH_PROJECT.txt"     # visible: Kaggle may drop hidden files
 if not (PROJECT / MARKER).is_file() and INPUT_ROOT.exists():
     for found in sorted(INPUT_ROOT.glob(f"**/{MARKER}")):
         shutil.copytree(found.parent, PROJECT, dirs_exist_ok=True)

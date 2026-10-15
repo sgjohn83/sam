@@ -274,6 +274,10 @@ def main():
     figs = p2 / "figures"
     n_png = len(list(figs.glob("*.png"))) if figs.is_dir() else 0
     check("all twelve figures are drawn", n_png == 12, f"{n_png} PNG")
+    n_files = sum(1 for f in p2.rglob("*") if f.is_file())
+    check("the saved output stays small in file count (audio packed)",
+          n_files < 200 and (p2 / "datasets/LibriSpeech_selected.tar").is_file()
+          and (p2 / "preprocessed/vctk_16k.tar").is_file(), f"{n_files} files")
     check("the replication report and the zip are written",
           (p2 / "REPLICATION_REPORT.md").is_file()
           and (p2 / "AttackAware_PolyIoM_fresh_results.zip").is_file())

@@ -317,6 +317,22 @@ def save_flac_16k(path, wav):
     sf.write(str(path), wav.numpy(), 16000, format="FLAC", subtype="PCM_16")
 
 
+def pack_folder(folder):
+    """Keep a finished audio folder as one uncompressed tar. Kaggle saves a
+    session's output file by file, and the audio is never read again once
+    it is embedded; the tar keeps it for audit."""
+    folder = Path(folder)
+    if not folder.is_dir():
+        return
+    tar_path = folder.parent / f"{folder.name}.tar"
+    tmp = folder.parent / f"{folder.name}.tar.tmp"
+    with tarfile.open(tmp, "w") as tf:
+        tf.add(folder, arcname=folder.name)
+    os.replace(tmp, tar_path)
+    shutil.rmtree(folder)
+    print(f"  packed {folder.name} into {tar_path.name}")
+
+
 # ------------------------------------------------------------ stage 1: LFW
 def prepare_lfw_raw():
     root = LFW_LOCAL_ROOT / "lfw"
@@ -575,6 +591,7 @@ def stage_voice():
     exact("LibriSpeech embeddings file sha256", sha256_file(LIBRI_EMB),
           REF["libri_embeddings_sha256"])
     mark_stage("libri_embeddings", {"embeddings": len(embs), "sha256": sha256_file(LIBRI_EMB)})
+    pack_folder(LIBRI_SELECTED_ROOT)
 
 
 # ------------------------------------------------------- stage 4: tensors
@@ -938,6 +955,7 @@ def stage_external():
     exact("VCTK manifest sha256", sha256_file(VCTK_MANIFEST), REF["vctk_manifest_sha256"])
     extract_vctk_embeddings()
     VCTK_ARCHIVE.unlink(missing_ok=True)
+    pack_folder(DIR["audio_vctk"])
     chosen = json.loads((DIR["seal"] / "operating_point_voice.json").read_text())
     result = dict(evaluate_partition("voice", *vctk_external_data(), chosen, "EXT"),
                   corpus="VCTK-Corpus-0.92")
