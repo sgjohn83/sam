@@ -97,6 +97,41 @@ continues, and the final report sets each result beside the paper's with
 the fresh 95% interval.
 """
 
+PINS = '''#@title 0. The study's torch version (runs before torch is first imported)
+# The study ran on torch 2.11.0 (CUDA 12.8 build); see seal/environment.json
+# in its record. A different torch can move embeddings in their last digits,
+# which then carries into the key, the sweep and every result. If this
+# install fails, the run continues on Kaggle's own torch and the stage
+# checks will show where that makes a difference.
+import os, subprocess, sys
+from importlib import metadata
+
+STUDY_TORCH = {"torch": "2.11.0", "torchvision": "0.26.0", "torchaudio": "2.11.0"}
+
+
+def _version(name):
+    try:
+        return metadata.version(name)
+    except metadata.PackageNotFoundError:
+        return ""
+
+
+if os.environ.get("POLYIOM_SKIP_PINS") == "1":
+    print("library pins skipped (POLYIOM_SKIP_PINS=1)")
+elif "torch" in sys.modules:
+    print("torch is already imported: choose Run > Restart & clear outputs, then Run All")
+else:
+    need = [f"{k}=={v}" for k, v in STUDY_TORCH.items() if not _version(k).startswith(v)]
+    if need:
+        print("installing the study's versions:", " ".join(need))
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", *need,
+                                   "--index-url", "https://download.pytorch.org/whl/cu128"])
+        except Exception as exc:
+            print(f"could not install them ({exc}); continuing with Kaggle's torch")
+    print({k: _version(k) for k in STUDY_TORCH})
+'''
+
 SETUP = '''#@title 1. Settings, earlier work and checklist
 import hashlib, importlib.util, json, math, os, shutil, sys
 from pathlib import Path
@@ -270,7 +305,7 @@ def markdown(source):
 
 
 def build():
-    cells = [markdown(INTRO), code(SETUP)]
+    cells = [markdown(INTRO), code(PINS), code(SETUP)]
     for number, (path, what) in enumerate(FILES, start=2):
         cells.append(code(f"%%writefile {{RUNTIME}}/{path.name}\n# {number}. {what}\n"
                           + path.read_text()))

@@ -192,7 +192,7 @@ def run(label, project, input_root, raw, hours, ref):
               if c.cell_type == "code" and "Load the runtime" in c.source)
     nb.cells.insert(at + 1, nbformat.v4.new_code_cell(
         TEST_CELL.format(src=str(SRC), ref=ref, split=SPLIT)))
-    os.environ.update(POLYIOM_PROJECT=str(project), POLYIOM_INPUT=str(input_root),
+    os.environ.update(POLYIOM_SKIP_PINS="1", POLYIOM_PROJECT=str(project), POLYIOM_INPUT=str(input_root),
                       POLYIOM_RAW=str(raw), POLYIOM_RUNTIME=str(ROOT / f"runtime_{label}"),
                       POLYIOM_SESSION_HOURS=str(hours), MPLBACKEND="Agg")
     client = nbclient.NotebookClient(nb, timeout=3600, kernel_name="python3",
