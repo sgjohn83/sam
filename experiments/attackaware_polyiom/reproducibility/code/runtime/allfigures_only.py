@@ -334,11 +334,10 @@ def select(modality, rows, floor):
 
 
 # ------------------------------------------------------------- intervals
-# Seeds of the study's held-out interval run, as recorded in
-# RESULTS_SUMMARY.md; used only if runs/heldout/heldout_confidence.json
-# does not record them itself. The external seed is derived by the
-# study's own rule.
-HELDOUT_SEEDS = {"face": 6353163838588607505, "voice": 4722292304065993655}
+def heldout_seed(modality):
+    """The study's held-out interval seed. Reproduces the seeds recorded in
+    RESULTS_SUMMARY.md: face 6353163838588607505, voice 4722292304065993655."""
+    return H(S0, "HELDOUT-CONFIDENCE", modality)
 
 
 def external_seed(modality):
@@ -360,7 +359,7 @@ def _seed_for(modality, partition):
             .get("bootstrap_seed")
         if recorded is not None:
             return int(recorded)
-    return (HELDOUT_SEEDS[modality] if partition == "evaluation"
+    return (heldout_seed(modality) if partition == "evaluation"
             else external_seed(modality))
 
 
