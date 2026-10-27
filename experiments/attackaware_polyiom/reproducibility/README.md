@@ -5,6 +5,7 @@ that produced them.
 
 ```
 run.py               one entry point: verify | test | demo | parity | figures | all
+RUN_CHECKS.ipynb     the same steps as a notebook (Colab, Kaggle, Jupyter): no terminal
 verify.py            recomputes every number the paper reports, from results/
 figures.py           draws the eight results figures from results/ into figures/
 figures_from_scores.py  draws Figures A-D from score_histograms.json (any computer)
@@ -25,6 +26,8 @@ code/notebooks/      the Colab notebooks that load and run it, including
                      every figure from it
 code/build_all_figures_notebook.py   assembles ALL_FIGURES from code/runtime/
 code/check_all_figures_notebook.py   runs ALL_FIGURES end to end on stand-in data
+code/build_run_checks_notebook.py    assembles RUN_CHECKS.ipynb
+kaggle/              the whole study rerun from the public datasets on Kaggle
 code/figures/        figure builders and the figure explanation text
 tests/               29 unit tests for the pipeline and the metrics
 REVIEWER.md          the five-minute path, and what we would raise ourselves
